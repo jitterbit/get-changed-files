@@ -3501,15 +3501,28 @@ function run() {
             const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
             core.debug(`Client: ${Object.keys(client)}`);
             core.debug(`Disk: ${disk}`);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const commits = github_1.context.payload.commits;
-            if (!commits || !Array.isArray(commits) || commits.length <= 0) {
-                core.setFailed(`Commits are missing from the payload for this ${github_1.context.eventName} event. ` +
+            const base = github_1.context.payload.before;
+            const head = github_1.context.payload.after;
+            if (!base || !head) {
+                core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
-            core.debug(Object.keys(commits[0]).toString());
-            core.debug(Object.keys(github_1.context.payload).toString());
-            core.debug(github_1.context.eventName);
+            const response = yield client.repos.compareCommits({
+                base,
+                head,
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo
+            });
+            if (response.status !== 200) {
+                core.setFailed(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
+                    "Please submit an issue on this action's GitHub repo.");
+            }
+            if (response.data.status !== 'ahead') {
+                core.setFailed(`The head commit for this ${github_1.context.eventName} event is not ahead of the base commit. ` +
+                    "Please submit an issue on this action's GitHub repo.");
+            }
+            const files = response.data.files;
+            core.debug(JSON.stringify(files));
         }
         catch (error) {
             core.setFailed(error.message);

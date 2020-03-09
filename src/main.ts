@@ -10,19 +10,38 @@ async function run(): Promise<void> {
     core.debug(`Client: ${Object.keys(client)}`)
     core.debug(`Disk: ${disk}`)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const commits: any[] = context.payload.commits
+    const base: string = context.payload.before
+    const head: string = context.payload.after
 
-    if (!commits || !Array.isArray(commits) || commits.length <= 0) {
+    if (!base || !head) {
       core.setFailed(
-        `Commits are missing from the payload for this ${context.eventName} event. ` +
+        `The base and head commits are missing from the payload for this ${context.eventName} event. ` +
           "Please submit an issue on this action's GitHub repo."
       )
     }
 
-    core.debug(Object.keys(commits[0]).toString())
-    core.debug(Object.keys(context.payload).toString())
-    core.debug(context.eventName)
+    const response = await client.repos.compareCommits({
+      base,
+      head,
+      owner: context.repo.owner,
+      repo: context.repo.repo
+    })
+
+    if (response.status !== 200) {
+      core.setFailed(
+        `The GitHub API for comparing the base and head commits for this ${context.eventName} event returned ${response.status}, expected 200. ` +
+          "Please submit an issue on this action's GitHub repo."
+      )
+    }
+
+    if (response.data.status !== 'ahead') {
+      core.setFailed(
+        `The head commit for this ${context.eventName} event is not ahead of the base commit. ` +
+          "Please submit an issue on this action's GitHub repo."
+      )
+    }
+    const files = response.data.files
+    core.debug(JSON.stringify(files))
   } catch (error) {
     core.setFailed(error.message)
   }
