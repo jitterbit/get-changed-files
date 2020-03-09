@@ -3499,12 +3499,16 @@ function run() {
         try {
             const client = new github_1.GitHub(core.getInput('token', { required: true }));
             const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
-            core.debug(`Client: ${client.toString()}`);
+            core.debug(`Client: ${Object.keys(client)}`);
             core.debug(`Disk: ${disk}`);
             const commits = github_1.context.payload.commits;
-            core.debug(commits.toString());
-            core.debug(github_1.context.payload.toString());
-            // core.debug(JSON.stringify(context.payload))
+            if (commits) {
+                core.debug(Object.keys(commits).toString());
+            }
+            else {
+                core.debug("commits doesn't exist");
+            }
+            core.debug(Object.keys(github_1.context.payload).toString());
         }
         catch (error) {
             core.setFailed(error.message);

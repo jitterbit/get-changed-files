@@ -7,13 +7,16 @@ async function run(): Promise<void> {
     const client = new GitHub(core.getInput('token', {required: true}))
     const disk: boolean = parseBoolean(core.getInput('disk', {required: true}))
 
-    core.debug(`Client: ${client.toString()}`)
+    core.debug(`Client: ${Object.keys(client)}`)
     core.debug(`Disk: ${disk}`)
 
     const commits = context.payload.commits
-    core.debug(commits.toString())
-    core.debug(context.payload.toString())
-    // core.debug(JSON.stringify(context.payload))
+    if (commits) {
+      core.debug(Object.keys(commits).toString())
+    } else {
+      core.debug("commits doesn't exist")
+    }
+    core.debug(Object.keys(context.payload).toString())
   } catch (error) {
     core.setFailed(error.message)
   }

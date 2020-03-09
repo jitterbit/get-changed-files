@@ -50,44 +50,16 @@ jobs:
 
       - name: Print steps context output
         run: |
-          echo 'steps.files.outputs.all:'
-          echo '${{ steps.files.outputs.all }}'
-          echo
-
-          echo 'steps.files.outputs.added:'
-          echo '${{ steps.files.outputs.added }}'
-          echo
-
-          echo 'steps.files.outputs.deleted:'
-          echo '${{ steps.files.outputs.deleted }}'
-          echo
-
-          echo 'steps.files.outputs.modified:'
-          echo '${{ steps.files.outputs.modified }}'
-          echo
-
-          echo 'steps.files.outputs.added_modified:'
-          echo '${{ steps.files.outputs.added_modified }}'
-          echo
+          echo 'steps.files.outputs.all=${{ steps.files.outputs.all }}'
+          echo 'steps.files.outputs.added=${{ steps.files.outputs.added }}'
+          echo 'steps.files.outputs.deleted=${{ steps.files.outputs.deleted }}'
+          echo 'steps.files.outputs.modified=${{ steps.files.outputs.modified }}'
+          echo 'steps.files.outputs.added_modified=${{ steps.files.outputs.added_modified }}'
 
       - name: Print disk output
         run: |
-          echo 'cat ./files/all.json:'
-          cat ./files/all.json
-          echo
-
-          echo 'cat ./files/added.json:'
-          cat ./files/added.json
-          echo
-
-          echo 'cat ./files/deleted.json:'
-          cat ./files/deleted.json
-          echo
-
-          echo 'cat ./files/modified.json:'
-          cat ./files/modified.json
-          echo
-
-          echo 'cat ./files/added_modified.json:'
-          cat ./files/added_modified.json
-          echo
+          echo "./files/all.json=$(cat ./files/all.json)"
+          echo "./files/added.json=$(cat ./files/added.json)"
+          echo "./files/deleted.json=$(cat ./files/deleted.json)"
+          echo "./files/modified.json=$(cat ./files/modified.json)"
+          echo "./files/added_modified.json=$(cat ./files/added_modified.json)"
