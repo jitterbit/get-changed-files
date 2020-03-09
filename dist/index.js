@@ -3493,36 +3493,108 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
 const parse_boolean_1 = __webpack_require__(146);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Create GitHub client with the API token.
             const client = new github_1.GitHub(core.getInput('token', { required: true }));
+            // Parse the boolean flag for whether to write to disk or not.
             const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
-            core.debug(`Client: ${Object.keys(client)}`);
             core.debug(`Disk: ${disk}`);
+            // Extract the base and head commits from the webhook payload.
             const base = github_1.context.payload.before;
             const head = github_1.context.payload.after;
+            // Ensure that the base and head properties are set on the payload.
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
+            // Use GitHub's compare two commits API.
+            // https://developer.github.com/v3/repos/commits/#compare-two-commits
             const response = yield client.repos.compareCommits({
                 base,
                 head,
                 owner: github_1.context.repo.owner,
                 repo: github_1.context.repo.repo
             });
+            // Ensure that the request was successful.
             if (response.status !== 200) {
                 core.setFailed(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
+            // Ensure that the head commit is ahead of the base commit.
             if (response.data.status !== 'ahead') {
                 core.setFailed(`The head commit for this ${github_1.context.eventName} event is not ahead of the base commit. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
+            // Get the changed files from the response payload.
             const files = response.data.files;
-            core.debug(JSON.stringify(files));
+            const all = files.reduce((acc, file) => {
+                acc.push(file.filename);
+                return acc;
+            }, []);
+            const added = files.reduce((acc, file) => {
+                if (file.status === 'added') {
+                    acc.push(file.filename);
+                }
+                return acc;
+            }, []);
+            const modified = files.reduce((acc, file) => {
+                if (file.status === 'modified') {
+                    acc.push(file.filename);
+                }
+                return acc;
+            }, []);
+            const deleted = files.reduce((acc, file) => {
+                if (file.status === 'removed') {
+                    acc.push(file.filename);
+                }
+                return acc;
+            }, []);
+            const addedModified = files.reduce((acc, file) => {
+                if (file.status === 'added' || file.status === 'modified') {
+                    acc.push(file.filename);
+                }
+                return acc;
+            }, []);
+            core.debug(`All: ${JSON.stringify(all)}`);
+            core.debug(`Added: ${JSON.stringify(added)}`);
+            core.debug(`Modified: ${JSON.stringify(modified)}`);
+            core.debug(`Deleted: ${JSON.stringify(deleted)}`);
+            core.debug(`Added or modified: ${JSON.stringify(addedModified)}`);
+            if (disk) {
+                core.debug(`Writing output to disk at ${path.resolve(__dirname, 'changed-files')}`);
+                yield Promise.all([
+                    fs.writeFile(path.resolve(__dirname, 'changed-files', 'all.json'), JSON.stringify(all), err => {
+                        var _a;
+                        core.setFailed(`Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'all.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
+                    }),
+                    fs.writeFile(path.resolve(__dirname, 'changed-files', 'added.json'), JSON.stringify(added), err => {
+                        var _a;
+                        core.setFailed(`Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'added.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
+                    }),
+                    fs.writeFile(path.resolve(__dirname, 'changed-files', 'modified.json'), JSON.stringify(modified), err => {
+                        var _a;
+                        core.setFailed(`Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'modified.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
+                    }),
+                    fs.writeFile(path.resolve(__dirname, 'changed-files', 'deleted.json'), JSON.stringify(deleted), err => {
+                        var _a;
+                        core.setFailed(`Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'deleted.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
+                    }),
+                    fs.writeFile(path.resolve(__dirname, 'changed-files', 'added_modified.json'), JSON.stringify(addedModified), err => {
+                        var _a;
+                        core.setFailed(`Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'added_modified.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
+                    })
+                ]);
+            }
+            core.setOutput('all', JSON.stringify(all));
+            core.setOutput('added', JSON.stringify(all));
+            core.setOutput('modified', JSON.stringify(all));
+            core.setOutput('deleted', JSON.stringify(all));
+            core.setOutput('added_modified', JSON.stringify(all));
         }
         catch (error) {
             core.setFailed(error.message);

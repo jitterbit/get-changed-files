@@ -15,8 +15,9 @@ inputs:
     default: ${{ github.token }}
   disk:
     description: >
-      Write the JSON arrays to disk at `./files/all.json`, `./files/added.json`, `./files/deleted.json`,
-      `./files/modified.json`, and `./files/added_modified.json`.
+      Write the JSON arrays to disk at `./changed-files/all.json`, `./changed-files/added.json`,
+      `./changed-files/modified.json`, `./changed-files/deleted.json`,
+      and `./changed-files/added_modified.json`.
       The contents of these files mirror that of their respective output parameters.
     required: true
     default: 'false'
@@ -27,12 +28,12 @@ outputs:
   added:
     description: >
       Array of added files, represented as a JSON array string.
-  deleted:
-    description: >
-      Array of deleted files, represented as a JSON array string.
   modified:
     description: >
       Array of modified files, represented as a JSON array string.
+  deleted:
+    description: >
+      Array of deleted files, represented as a JSON array string.
   added_modified:
     description: >
       Array of all added or modified files, represented as a JSON array string.
