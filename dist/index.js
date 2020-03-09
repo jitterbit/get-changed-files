@@ -3261,6 +3261,20 @@ module.exports.MaxBufferError = MaxBufferError;
 
 /***/ }),
 
+/***/ 146:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function parseBoolean(value) {
+    return value.toLowerCase() === 'true';
+}
+exports.parseBoolean = parseBoolean;
+
+
+/***/ }),
+
 /***/ 148:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3479,15 +3493,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
+const parse_boolean_1 = __webpack_require__(146);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const client = new github_1.GitHub(core.getInput('token', { required: true }));
-            const disk = core.getInput('disk', { required: true });
+            const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
             core.debug(`Client: ${client.toString()}`);
             core.debug(`Disk: ${disk}`);
             const commits = github_1.context.payload.commits;
-            core.debug(commits);
+            core.debug(commits.toString());
+            core.debug(github_1.context.payload.toString());
+            // core.debug(JSON.stringify(context.payload))
         }
         catch (error) {
             core.setFailed(error.message);
