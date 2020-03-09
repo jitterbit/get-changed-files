@@ -90,49 +90,52 @@ async function run(): Promise<void> {
     core.debug(`Added or modified: ${JSON.stringify(addedModified)}`)
 
     if (disk) {
-      core.debug(`Writing output to disk at ${path.resolve(__dirname, 'changed-files')}`)
+      core.debug(`Writing output to disk at ${path.resolve('changed-files')}`)
       await Promise.all([
-        fs.writeFile(path.resolve(__dirname, 'changed-files', 'all.json'), JSON.stringify(all), err => {
+        fs.mkdir(path.resolve('changed-files'), err => {
           core.setFailed(
-            `Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'all.json')} with error code ${
+            `Failed to make directory ${path.resolve('changed-files')} with error code ${
+              err?.code
+            }. Please submit an issue on this action's GitHub repo.`
+          )
+        })
+      ])
+      await Promise.all([
+        fs.writeFile(path.resolve('changed-files', 'all.json'), JSON.stringify(all), err => {
+          core.setFailed(
+            `Failed to write to disk at ${path.resolve('changed-files', 'all.json')} with error code ${
               err?.code
             }. Please submit an issue on this action's GitHub repo.`
           )
         }),
-        fs.writeFile(path.resolve(__dirname, 'changed-files', 'added.json'), JSON.stringify(added), err => {
+        fs.writeFile(path.resolve('changed-files', 'added.json'), JSON.stringify(added), err => {
           core.setFailed(
-            `Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'added.json')} with error code ${
+            `Failed to write to disk at ${path.resolve('changed-files', 'added.json')} with error code ${
               err?.code
             }. Please submit an issue on this action's GitHub repo.`
           )
         }),
-        fs.writeFile(path.resolve(__dirname, 'changed-files', 'modified.json'), JSON.stringify(modified), err => {
+        fs.writeFile(path.resolve('changed-files', 'modified.json'), JSON.stringify(modified), err => {
           core.setFailed(
-            `Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'modified.json')} with error code ${
+            `Failed to write to disk at ${path.resolve('changed-files', 'modified.json')} with error code ${
               err?.code
             }. Please submit an issue on this action's GitHub repo.`
           )
         }),
-        fs.writeFile(path.resolve(__dirname, 'changed-files', 'deleted.json'), JSON.stringify(deleted), err => {
+        fs.writeFile(path.resolve('changed-files', 'deleted.json'), JSON.stringify(deleted), err => {
           core.setFailed(
-            `Failed to write to disk at ${path.resolve(__dirname, 'changed-files', 'deleted.json')} with error code ${
+            `Failed to write to disk at ${path.resolve('changed-files', 'deleted.json')} with error code ${
               err?.code
             }. Please submit an issue on this action's GitHub repo.`
           )
         }),
-        fs.writeFile(
-          path.resolve(__dirname, 'changed-files', 'added_modified.json'),
-          JSON.stringify(addedModified),
-          err => {
-            core.setFailed(
-              `Failed to write to disk at ${path.resolve(
-                __dirname,
-                'changed-files',
-                'added_modified.json'
-              )} with error code ${err?.code}. Please submit an issue on this action's GitHub repo.`
-            )
-          }
-        )
+        fs.writeFile(path.resolve('changed-files', 'added_modified.json'), JSON.stringify(addedModified), err => {
+          core.setFailed(
+            `Failed to write to disk at ${path.resolve('changed-files', 'added_modified.json')} with error code ${
+              err?.code
+            }. Please submit an issue on this action's GitHub repo.`
+          )
+        })
       ])
     }
 
