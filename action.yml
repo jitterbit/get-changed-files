@@ -1,10 +1,38 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
-inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+name: Get Modified Files
+description: Get the files modified in a commit or commits
+author: Jitterbit, Inc.
+branding:
+  icon: file
+  color: purple
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node12
+  main: dist/index.js
+inputs:
+  token:
+    description: >
+      GitHub token for GitHub API requests. Users shouldn't need to set this themselves.
+    required: true
+    default: ${{ github.token }}
+  disk:
+    description: >
+      Write the JSON arrays to disk at `./files/all.json`, `./files/added.json`, `./files/deleted.json`,
+      `./files/modified.json`, and `./files/added_modified.json`.
+      The contents of these files mirror that of their respective output parameters.
+    required: true
+    default: 'false'
+outputs:
+  all:
+    description: >
+      Array of all changed files, represented as a JSON array string.
+  added:
+    description: >
+      Array of added files, represented as a JSON array string.
+  deleted:
+    description: >
+      Array of deleted files, represented as a JSON array string.
+  modified:
+    description: >
+      Array of modified files, represented as a JSON array string.
+  added_modified:
+    description: >
+      Array of all added or modified files, represented as a JSON array string.

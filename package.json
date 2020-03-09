@@ -1,45 +1,62 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "get-changed-files",
+  "description": "GitHub action that gets all changed files in a pull request or push.",
+  "version": "1.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "main": "lib/main.js",
-  "scripts": {
-    "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "pack": "ncc build",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
-  },
+  "author": "Jitterbit, Inc.",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/jiterbit/get-changed-files.git"
+  },
+  "homepage": "https://github.com/jitterbit/get-changed-files#readme",
+  "bugs": {
+    "url": "https://github.com/jitterbit/get-changed-files/issues"
   },
   "keywords": [
-    "actions",
-    "node",
-    "setup"
+    "GitHub",
+    "Actions",
+    "TypeScript",
+    "JavaScript",
+    "Get",
+    "Changed",
+    "Modified",
+    "Diff",
+    "Files"
   ],
-  "author": "YourNameOrOrganization",
-  "license": "MIT",
+  "main": "lib/main.js",
+  "engines": {
+    "node": "^12.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist/**/* lib/**/*",
+    "format": "prettier --write **/*.ts",
+    "format:check": "prettier --check **/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build",
+    "test": "jest",
+    "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package && yarn test"
+  },
   "dependencies": {
-    "@actions/core": "^1.2.0"
+    "@actions/core": "^1.2.2",
+    "@actions/github": "^2.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "@types/node": "^12.7.12",
+    "@octokit/rest": "^16.40.2",
+    "@types/jest": "^25.1.1",
+    "@types/node": "^12.12.29",
     "@typescript-eslint/parser": "^2.8.0",
-    "@zeit/ncc": "^0.20.5",
-    "eslint": "^5.16.0",
-    "eslint-plugin-github": "^2.0.0",
-    "eslint-plugin-jest": "^22.21.0",
-    "jest": "^24.9.0",
-    "jest-circus": "^24.9.0",
+    "@zeit/ncc": "^0.21.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-github": "^3.4.0",
+    "eslint-plugin-jest": "^23.6.0",
+    "jest": "^25.1.0",
+    "jest-circus": "^25.1.0",
     "js-yaml": "^3.13.1",
     "prettier": "^1.19.1",
-    "ts-jest": "^24.2.0",
+    "rimraf": "^3.0.0",
+    "ts-jest": "^25.1.0",
     "typescript": "^3.6.4"
   }
 }

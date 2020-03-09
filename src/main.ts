@@ -1,16 +1,18 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {context, GitHub} from '@actions/github'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const client = new GitHub(core.getInput('token', {required: true}))
+    const disk = core.getInput('disk', {required: true})
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    core.debug(`Client: ${client.toString()}`)
+    core.debug(`Disk: ${disk}`)
 
-    core.setOutput('time', new Date().toTimeString())
+    const commits = context.payload.commits
+    core.debug(commits)
+    core.debug(context.payload.toString())
+    core.debug(JSON.stringify(context.payload))
   } catch (error) {
     core.setFailed(error.message)
   }

@@ -1,23 +1,92 @@
-name: "build-test"
-on: # rebuild any PRs and main branch changes
+name: Test
+
+on:
   pull_request:
   push:
     branches:
       - master
-      - 'releases/*'
+      - releases/*
 
 jobs:
-  build: # make sure build/ci work properly
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
-  test: # make sure the action works on a clean machine without building
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          yarn
+
+      - name: Clean, build, format, lint, package, and test
+        run: |
+          yarn all
+
+      - name: Check if packaged properly
+        run: |
+          # If there are any unstaged or untracked files in 'dist/', then the action wasn't packaged properly
+          if git diff --name-only | grep '^dist/' || git ls-files --other --exclude-standard | grep '^dist/'; then
+            echo "You didn't package the action properly before pushing to remote." \
+            echo "Always run 'yarn all' before staging a commit."
+            echo "Below are the modified files in 'dist/' after running 'yarn && rm -rf dist/ && yarn all':"
+            git diff --name-only | grep '^dist/'
+            git ls-files --other --exclude-standard | grep '^dist/'
+            exit 1
+          fi
+
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ./
-      with: 
-        milliseconds: 1000
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - id: files
+        name: Run the action
+        uses: ./
+        disk: true
+
+      - name: Print steps context output
+        run: |
+          echo 'steps.files.outputs.all:'
+          echo '${{ steps.files.outputs.all }}'
+          echo
+
+          echo 'steps.files.outputs.added:'
+          echo '${{ steps.files.outputs.added }}'
+          echo
+
+          echo 'steps.files.outputs.deleted:'
+          echo '${{ steps.files.outputs.deleted }}'
+          echo
+
+          echo 'steps.files.outputs.modified:'
+          echo '${{ steps.files.outputs.modified }}'
+          echo
+
+          echo 'steps.files.outputs.added_modified:'
+          echo '${{ steps.files.outputs.added_modified }}'
+          echo
+
+      - name: Print disk output
+        run: |
+          echo 'cat ./files/all.json:'
+          cat ./files/all.json
+          echo
+
+          echo 'cat ./files/added.json:'
+          cat ./files/added.json
+          echo
+
+          echo 'cat ./files/deleted.json:'
+          cat ./files/deleted.json
+          echo
+
+          echo 'cat ./files/modified.json:'
+          cat ./files/modified.json
+          echo
+
+          echo 'cat ./files/added_modified.json:'
+          cat ./files/added_modified.json
+          echo

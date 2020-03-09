@@ -1,101 +1,69 @@
 <p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/jitterbit/get-modified-files/actions"><img alt="jitterbit/get-modified-files status" src="https://github.com/jitterbit/get-modified-files/workflows/Test/badge.svg"></a>
 </p>
 
-# Create a JavaScript Action using TypeScript
+# Get Modified Files
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+Get the files modified in a commit or commits.
+You can choose to get all changed files, only added files, only modified files, only deleted files, or all added and modified files.
+These outputs are available via the `steps` output context and the local file system.
+The `steps` output context exposes the output names `all`, `added`, `deleted`, `modified`, and `added_modified`.
+The step also outputs these files to the local file system at `./changed-files/`.
+The file names are `changed-files/all.json`, `changed-files/added.json`, `changed-files/deleted.json`, `changed-files/modified.json`, and `changed-files/added_modified.json`.
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.  
+# Usage
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
-
-## Create an action from this template
-
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Master
-
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run pack
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run pack
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml)])
+See [action.yml](action.yml)
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+- uses: jitterbit/get-modified-files@v1
+  with:
+    # Write the JSON arrays to disk at `./files/all.json`, `./files/added.json`, `./files/deleted.json`,
+    # `./files/modified.json`, and `./files/added_modified.json`.
+    # The contents of these files mirror that of their respective output parameters.
+    # Default: false
+    disk: ''
 ```
 
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+# Scenarios
 
-## Usage:
+- [Get all changed files from steps context](#Get-all-changed-files-from-steps-context)
+- [Get all deleted files from disk](#Get-all-deleted-files-from-disk)
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+## Get all changed files from steps context
+
+```yaml
+- id: files
+  uses: jitterbit/get-modified-files@v1
+- run: |
+    changed_files=($(echo '${{ steps.files.outputs.all }}' | jq -r 'join(" ")'))
+    for changed_file in ${changed_files[@]}; do
+      echo "Do something with this ${changed_file}."
+    done
+```
+
+## Get all deleted files from disk
+
+```yaml
+- uses: jitterbit/get-modified-files@v1
+  with:
+    disk: true
+- run: |
+    deleted_files=($(cat 'files/deleted.json' | jq -r 'join(" ")'))
+    for deleted_file in ${deleted_files[@]}; do
+      echo "Do something with this ${deleted_file}."
+    done
+```
+
+# Install, Build, Lint, Test, and Package
+
+Make sure to do the following before checking in any code changes.
+
+```bash
+$ yarn
+$ yarn all
+```
+
+# License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE)
