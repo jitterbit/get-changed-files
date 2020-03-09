@@ -45,7 +45,8 @@ jobs:
       - id: files
         name: Run the action
         uses: ./
-        disk: true
+        with:
+          disk: true
 
       - name: Print steps context output
         run: |
