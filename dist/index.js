@@ -3501,14 +3501,15 @@ function run() {
             const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
             core.debug(`Client: ${Object.keys(client)}`);
             core.debug(`Disk: ${disk}`);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const commits = github_1.context.payload.commits;
-            if (commits) {
-                core.debug(Object.keys(commits).toString());
+            if (!commits || !Array.isArray(commits) || commits.length <= 0) {
+                core.setFailed(`Commits are missing from the payload for this ${github_1.context.eventName} event. ` +
+                    "Please submit an issue on this action's GitHub repo.");
             }
-            else {
-                core.debug("commits doesn't exist");
-            }
+            core.debug(Object.keys(commits[0]).toString());
             core.debug(Object.keys(github_1.context.payload).toString());
+            core.debug(github_1.context.eventName);
         }
         catch (error) {
             core.setFailed(error.message);

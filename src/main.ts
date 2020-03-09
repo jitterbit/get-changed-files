@@ -10,13 +10,19 @@ async function run(): Promise<void> {
     core.debug(`Client: ${Object.keys(client)}`)
     core.debug(`Disk: ${disk}`)
 
-    const commits = context.payload.commits
-    if (commits) {
-      core.debug(Object.keys(commits).toString())
-    } else {
-      core.debug("commits doesn't exist")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const commits: any[] = context.payload.commits
+
+    if (!commits || !Array.isArray(commits) || commits.length <= 0) {
+      core.setFailed(
+        `Commits are missing from the payload for this ${context.eventName} event. ` +
+          "Please submit an issue on this action's GitHub repo."
+      )
     }
+
+    core.debug(Object.keys(commits[0]).toString())
     core.debug(Object.keys(context.payload).toString())
+    core.debug(context.eventName)
   } catch (error) {
     core.setFailed(error.message)
   }
