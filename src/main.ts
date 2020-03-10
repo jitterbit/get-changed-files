@@ -54,34 +54,40 @@ async function run(): Promise<void> {
 
     // Get the changed files from the response payload.
     const files = response.data.files
-    const all = files.reduce<string[]>((acc, file) => {
-      acc.push(file.filename)
-      return acc
-    }, [])
-    const added = files.reduce<string[]>((acc, file) => {
-      if ((file.status as FileStatus) === 'added') {
-        acc.push(file.filename)
+    const all = [] as string[],
+      added = [] as string[],
+      modified = [] as string[],
+      deleted = [] as string[],
+      addedModified = [] as string[]
+    for (const file of files) {
+      const filename = file.filename
+      // If we're using the 'space-delimited' format and any of the filenames have a space in them,
+      // then fail the step.
+      if (format === 'space-delimited' && filename.includes(' ')) {
+        core.setFailed(
+          `One of your files includes a space. Consider using a different output format or removing spaces from your filenames. ` +
+            "Please submit an issue on this action's GitHub repo."
+        )
       }
-      return acc
-    }, [])
-    const modified = files.reduce<string[]>((acc, file) => {
-      if ((file.status as FileStatus) === 'modified') {
-        acc.push(file.filename)
+      all.push(filename)
+      switch (file.status as FileStatus) {
+        case 'added':
+          added.push(filename)
+          addedModified.push(filename)
+          break
+        case 'modified':
+          modified.push(filename)
+          addedModified.push(filename)
+          break
+        case 'removed':
+          deleted.push(filename)
+          break
+        default:
+          core.setFailed(
+            `One of your files includes an unsupported file status ${file.status}, expected 'added', 'modified', or 'removed'.`
+          )
       }
-      return acc
-    }, [])
-    const deleted = files.reduce<string[]>((acc, file) => {
-      if ((file.status as FileStatus) === 'removed') {
-        acc.push(file.filename)
-      }
-      return acc
-    }, [])
-    const addedModified = files.reduce<string[]>((acc, file) => {
-      if ((file.status as FileStatus) === 'added' || (file.status as FileStatus) === 'modified') {
-        acc.push(file.filename)
-      }
-      return acc
-    }, [])
+    }
 
     // Format the arrays of changed files.
     let allFormatted: string,
