@@ -2,9 +2,9 @@
   <a href="https://github.com/jitterbit/get-changed-files/actions"><img alt="jitterbit/get-changed-files status" src="https://github.com/jitterbit/get-changed-files/workflows/Test/badge.svg"></a>
 </p>
 
-# Get Changed Files
+# Get All Changed Files
 
-Get the files changed in a pull request or push.
+Get all of the files changed/modified in a pull request or push's commits.
 You can choose to get all changed files, only added files, only modified files, only deleted files, or all added and modified files.
 These outputs are available via the `steps` output context.
 The `steps` output context exposes the output names `all`, `added`, `modified`, `deleted`, and `added_modified`.
