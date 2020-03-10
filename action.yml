@@ -1,5 +1,5 @@
-name: Get Modified Files
-description: Get the files modified in a commit or commits
+name: Get Changed Files
+description: Get the files changed in a pull request or push.
 author: Jitterbit, Inc.
 branding:
   icon: file
