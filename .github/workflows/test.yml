@@ -95,11 +95,3 @@ jobs:
           echo 'steps.files.outputs.deleted=${{ steps.files.outputs.deleted }}'
           echo 'steps.files.outputs.modified=${{ steps.files.outputs.modified }}'
           echo 'steps.files.outputs.added_modified=${{ steps.files.outputs.added_modified }}'
-
-      - name: Print disk output
-        run: |
-          echo "./files/all.json=$(cat ./files/all.json)"
-          echo "./files/added.json=$(cat ./files/added.json)"
-          echo "./files/deleted.json=$(cat ./files/deleted.json)"
-          echo "./files/modified.json=$(cat ./files/modified.json)"
-          echo "./files/added_modified.json=$(cat ./files/added_modified.json)"

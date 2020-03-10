@@ -6,10 +6,8 @@
 
 Get the files modified in a commit or commits.
 You can choose to get all changed files, only added files, only modified files, only deleted files, or all added and modified files.
-These outputs are available via the `steps` output context and the local file system.
+These outputs are available via the `steps` output context.
 The `steps` output context exposes the output names `all`, `added`, `modified`, `deleted`, and `added_modified`.
-The step also outputs these files to the local file system at `./changed-files/`.
-The file names are `changed-files/all.json`, `changed-files/added.json`, `changed-files/modified.json`, `changed-files/deleted.json`, and `changed-files/added_modified.json`.
 
 # Usage
 
@@ -26,9 +24,9 @@ See [action.yml](action.yml)
 
 # Scenarios
 
-- [Get all changed files as space-delimited](#Get-all-changed-files-as-space-delimited)
-- [Get all added and modified files as CSV](#Get-all-added-and-modified-files-as-CSV)
-- [Get all deleted files as JSON](#Get-all-deleted-files-as-JSON)
+- [Get all changed files as space-delimited](#get-all-changed-files-as-space-delimited)
+- [Get all added and modified files as CSV](#get-all-added-and-modified-files-as-csv)
+- [Get all deleted files as JSON](#get-all-deleted-files-as-json)
 
 ## Get all changed files as space-delimited
 

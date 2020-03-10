@@ -91,6 +91,13 @@ async function run(): Promise<void> {
       addedModifiedFormatted: string
     switch (format) {
       case 'space-delimited':
+        // If any of the filenames have a space in them, then fail the step.
+        for (const file of all) {
+          if (file.includes(' '))
+            core.setFailed(
+              `One of your files includes a space. Consider using a different output format or removing spaces from your filenames.`
+            )
+        }
         allFormatted = all.join(' ')
         addedFormatted = added.join(' ')
         modifiedFormatted = modified.join(' ')
