@@ -1,19 +1,19 @@
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
-import * as fs from 'fs'
-import * as path from 'path'
-import {parseBoolean} from './parse-boolean'
 
+type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed'
 
 async function run(): Promise<void> {
   try {
     // Create GitHub client with the API token.
     const client = new GitHub(core.getInput('token', {required: true}))
+    const format = core.getInput('format', {required: true}) as Format
 
-    // Parse the boolean flag for whether to write to disk or not.
-    const disk: boolean = parseBoolean(core.getInput('disk', {required: true}))
-    core.debug(`Disk: ${disk}`)
+    // Ensure that the format parameter is set properly.
+    if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
+      core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`)
+    }
 
     // Extract the base and head commits from the webhook payload.
     const base: string = context.payload.before
@@ -83,67 +83,49 @@ async function run(): Promise<void> {
       return acc
     }, [])
 
-    core.debug(`All: ${JSON.stringify(all)}`)
-    core.debug(`Added: ${JSON.stringify(added)}`)
-    core.debug(`Modified: ${JSON.stringify(modified)}`)
-    core.debug(`Deleted: ${JSON.stringify(deleted)}`)
-    core.debug(`Added or modified: ${JSON.stringify(addedModified)}`)
-
-    if (disk) {
-      core.debug(`Writing output to disk at ${path.resolve('changed-files')}`)
-      await Promise.all([
-        fs.mkdir(path.resolve('changed-files'), err => {
-          core.setFailed(
-            `Failed to make directory ${path.resolve('changed-files')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        })
-      ])
-      await Promise.all([
-        fs.writeFile(path.resolve('changed-files', 'all.json'), JSON.stringify(all), err => {
-          core.setFailed(
-            `Failed to write to disk at ${path.resolve('changed-files', 'all.json')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        }),
-        fs.writeFile(path.resolve('changed-files', 'added.json'), JSON.stringify(added), err => {
-          core.setFailed(
-            `Failed to write to disk at ${path.resolve('changed-files', 'added.json')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        }),
-        fs.writeFile(path.resolve('changed-files', 'modified.json'), JSON.stringify(modified), err => {
-          core.setFailed(
-            `Failed to write to disk at ${path.resolve('changed-files', 'modified.json')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        }),
-        fs.writeFile(path.resolve('changed-files', 'deleted.json'), JSON.stringify(deleted), err => {
-          core.setFailed(
-            `Failed to write to disk at ${path.resolve('changed-files', 'deleted.json')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        }),
-        fs.writeFile(path.resolve('changed-files', 'added_modified.json'), JSON.stringify(addedModified), err => {
-          core.setFailed(
-            `Failed to write to disk at ${path.resolve('changed-files', 'added_modified.json')} with error code ${
-              err?.code
-            }. Please submit an issue on this action's GitHub repo.`
-          )
-        })
-      ])
+    // Format the arrays of changed files.
+    let allFormatted: string,
+      addedFormatted: string,
+      modifiedFormatted: string,
+      deletedFormatted: string,
+      addedModifiedFormatted: string
+    switch (format) {
+      case 'space-delimited':
+        allFormatted = all.join(' ')
+        addedFormatted = added.join(' ')
+        modifiedFormatted = modified.join(' ')
+        deletedFormatted = deleted.join(' ')
+        addedModifiedFormatted = addedModified.join(' ')
+        break
+      case 'csv':
+        allFormatted = all.join(',')
+        addedFormatted = added.join(',')
+        modifiedFormatted = modified.join(',')
+        deletedFormatted = deleted.join(',')
+        addedModifiedFormatted = addedModified.join(',')
+        break
+      case 'json':
+        allFormatted = JSON.stringify(all)
+        addedFormatted = JSON.stringify(added)
+        modifiedFormatted = JSON.stringify(modified)
+        deletedFormatted = JSON.stringify(deleted)
+        addedModifiedFormatted = JSON.stringify(addedModified)
+        break
     }
 
-    core.setOutput('all', JSON.stringify(all))
-    core.setOutput('added', JSON.stringify(all))
-    core.setOutput('modified', JSON.stringify(all))
-    core.setOutput('deleted', JSON.stringify(all))
-    core.setOutput('added_modified', JSON.stringify(all))
+    // Debug log the output values.
+    core.debug(`All: ${allFormatted}`)
+    core.debug(`Added: ${addedFormatted}`)
+    core.debug(`Modified: ${modifiedFormatted}`)
+    core.debug(`Deleted: ${deletedFormatted}`)
+    core.debug(`Added or modified: ${addedModifiedFormatted}`)
+
+    // Set step output context.
+    core.setOutput('all', allFormatted)
+    core.setOutput('added', addedFormatted)
+    core.setOutput('modified', modifiedFormatted)
+    core.setOutput('deleted', deletedFormatted)
+    core.setOutput('added_modified', addedModifiedFormatted)
   } catch (error) {
     core.setFailed(error.message)
   }

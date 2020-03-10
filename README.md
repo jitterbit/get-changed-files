@@ -18,39 +18,51 @@ See [action.yml](action.yml)
 ```yaml
 - uses: jitterbit/get-modified-files@v1
   with:
-    # Write the JSON arrays to disk at `./changed-files/all.json`, `./changed-files/added.json`,
-    # `./changed-files/modified.json`, `./changed-files/deleted.json`,
-    # and `./changed-files/added_modified.json`.
-    # The contents of these files mirror that of their respective output parameters.
-    # Default: false
-    disk: ''
+    # Format of the steps output context.
+    # Can be 'space-delimited', 'csv', or 'json'.
+    # Default: 'space-delimited'
+    format: ''
 ```
 
 # Scenarios
 
-- [Get all changed files from steps context](#Get-all-changed-files-from-steps-context)
-- [Get all deleted files from disk](#Get-all-deleted-files-from-disk)
+- [Get all changed files as space-delimited](#Get-all-changed-files-as-space-delimited)
+- [Get all added and modified files as CSV](#Get-all-added-and-modified-files-as-CSV)
+- [Get all deleted files as JSON](#Get-all-deleted-files-as-JSON)
 
-## Get all changed files from steps context
+## Get all changed files as space-delimited
+
+If there are any files with spaces in them, then this method won't work and the step will fail.
+Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
   uses: jitterbit/get-modified-files@v1
 - run: |
-    changed_files=($(echo '${{ steps.files.outputs.all }}' | jq -r 'join(" ")'))
-    for changed_file in ${changed_files[@]}; do
+    for changed_file in ${{ steps.files.outputs.all }}; do
       echo "Do something with this ${changed_file}."
     done
 ```
 
-## Get all deleted files from disk
+## Get all added and modified files as CSV
 
 ```yaml
-- uses: jitterbit/get-modified-files@v1
-  with:
-    disk: true
+- id: files
+  uses: jitterbit/get-modified-files@v1
 - run: |
-    deleted_files=($(cat 'changed-files/deleted.json' | jq -r 'join(" ")'))
+    mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
+    for added_modified_file in "${added_modified_files[@]}"; do
+      echo "Do something with this ${added_modified_file}."
+    done
+```
+
+## Get all deleted files as JSON
+
+```yaml
+- id: files
+  uses: jitterbit/get-modified-files@v1
+- run: |
+    readarray -t deleted_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.deleted }}')"
     for deleted_file in ${deleted_files[@]}; do
       echo "Do something with this ${deleted_file}."
     done

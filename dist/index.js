@@ -3261,20 +3261,6 @@ module.exports.MaxBufferError = MaxBufferError;
 
 /***/ }),
 
-/***/ 146:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-function parseBoolean(value) {
-    return value.toLowerCase() === 'true';
-}
-exports.parseBoolean = parseBoolean;
-
-
-/***/ }),
-
 /***/ 148:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3493,17 +3479,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
-const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
-const parse_boolean_1 = __webpack_require__(146);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Create GitHub client with the API token.
             const client = new github_1.GitHub(core.getInput('token', { required: true }));
-            // Parse the boolean flag for whether to write to disk or not.
-            const disk = parse_boolean_1.parseBoolean(core.getInput('disk', { required: true }));
-            core.debug(`Disk: ${disk}`);
+            const format = core.getInput('format', { required: true });
+            // Ensure that the format parameter is set properly.
+            if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
+                core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`);
+            }
             // Extract the base and head commits from the webhook payload.
             const base = github_1.context.payload.before;
             const head = github_1.context.payload.after;
@@ -3560,47 +3545,43 @@ function run() {
                 }
                 return acc;
             }, []);
-            core.debug(`All: ${JSON.stringify(all)}`);
-            core.debug(`Added: ${JSON.stringify(added)}`);
-            core.debug(`Modified: ${JSON.stringify(modified)}`);
-            core.debug(`Deleted: ${JSON.stringify(deleted)}`);
-            core.debug(`Added or modified: ${JSON.stringify(addedModified)}`);
-            if (disk) {
-                core.debug(`Writing output to disk at ${path.resolve('changed-files')}`);
-                yield Promise.all([
-                    fs.mkdir(path.resolve('changed-files'), err => {
-                        var _a;
-                        core.setFailed(`Failed to make directory ${path.resolve('changed-files')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    })
-                ]);
-                yield Promise.all([
-                    fs.writeFile(path.resolve('changed-files', 'all.json'), JSON.stringify(all), err => {
-                        var _a;
-                        core.setFailed(`Failed to write to disk at ${path.resolve('changed-files', 'all.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    }),
-                    fs.writeFile(path.resolve('changed-files', 'added.json'), JSON.stringify(added), err => {
-                        var _a;
-                        core.setFailed(`Failed to write to disk at ${path.resolve('changed-files', 'added.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    }),
-                    fs.writeFile(path.resolve('changed-files', 'modified.json'), JSON.stringify(modified), err => {
-                        var _a;
-                        core.setFailed(`Failed to write to disk at ${path.resolve('changed-files', 'modified.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    }),
-                    fs.writeFile(path.resolve('changed-files', 'deleted.json'), JSON.stringify(deleted), err => {
-                        var _a;
-                        core.setFailed(`Failed to write to disk at ${path.resolve('changed-files', 'deleted.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    }),
-                    fs.writeFile(path.resolve('changed-files', 'added_modified.json'), JSON.stringify(addedModified), err => {
-                        var _a;
-                        core.setFailed(`Failed to write to disk at ${path.resolve('changed-files', 'added_modified.json')} with error code ${(_a = err) === null || _a === void 0 ? void 0 : _a.code}. Please submit an issue on this action's GitHub repo.`);
-                    })
-                ]);
+            // Format the arrays of changed files.
+            let allFormatted, addedFormatted, modifiedFormatted, deletedFormatted, addedModifiedFormatted;
+            switch (format) {
+                case 'space-delimited':
+                    allFormatted = all.join(' ');
+                    addedFormatted = added.join(' ');
+                    modifiedFormatted = modified.join(' ');
+                    deletedFormatted = deleted.join(' ');
+                    addedModifiedFormatted = addedModified.join(' ');
+                    break;
+                case 'csv':
+                    allFormatted = all.join(',');
+                    addedFormatted = added.join(',');
+                    modifiedFormatted = modified.join(',');
+                    deletedFormatted = deleted.join(',');
+                    addedModifiedFormatted = addedModified.join(',');
+                    break;
+                case 'json':
+                    allFormatted = JSON.stringify(all);
+                    addedFormatted = JSON.stringify(added);
+                    modifiedFormatted = JSON.stringify(modified);
+                    deletedFormatted = JSON.stringify(deleted);
+                    addedModifiedFormatted = JSON.stringify(addedModified);
+                    break;
             }
-            core.setOutput('all', JSON.stringify(all));
-            core.setOutput('added', JSON.stringify(all));
-            core.setOutput('modified', JSON.stringify(all));
-            core.setOutput('deleted', JSON.stringify(all));
-            core.setOutput('added_modified', JSON.stringify(all));
+            // Debug log the output values.
+            core.debug(`All: ${allFormatted}`);
+            core.debug(`Added: ${addedFormatted}`);
+            core.debug(`Modified: ${modifiedFormatted}`);
+            core.debug(`Deleted: ${deletedFormatted}`);
+            core.debug(`Added or modified: ${addedModifiedFormatted}`);
+            // Set step output context.
+            core.setOutput('all', allFormatted);
+            core.setOutput('added', addedFormatted);
+            core.setOutput('modified', modifiedFormatted);
+            core.setOutput('deleted', deletedFormatted);
+            core.setOutput('added_modified', addedModifiedFormatted);
         }
         catch (error) {
             core.setFailed(error.message);

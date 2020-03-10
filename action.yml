@@ -13,27 +13,25 @@ inputs:
       GitHub token for GitHub API requests. Users shouldn't need to set this themselves.
     required: true
     default: ${{ github.token }}
-  disk:
+  format:
     description: >
-      Write the JSON arrays to disk at `./changed-files/all.json`, `./changed-files/added.json`,
-      `./changed-files/modified.json`, `./changed-files/deleted.json`,
-      and `./changed-files/added_modified.json`.
-      The contents of these files mirror that of their respective output parameters.
+      Format of the steps output context.
+      Can be 'space-delimited', 'csv', or 'json'.
     required: true
-    default: 'false'
+    default: space-delimited
 outputs:
   all:
     description: >
-      Array of all changed files, represented as a JSON array string.
+      Array of all changed files.
   added:
     description: >
-      Array of added files, represented as a JSON array string.
+      Array of added files.
   modified:
     description: >
-      Array of modified files, represented as a JSON array string.
+      Array of modified files.
   deleted:
     description: >
-      Array of deleted files, represented as a JSON array string.
+      Array of deleted files.
   added_modified:
     description: >
-      Array of all added or modified files, represented as a JSON array string.
+      Array of all added and modified files.
