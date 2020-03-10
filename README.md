@@ -47,6 +47,8 @@ Consider using one of the other formats if that's the case.
 ```yaml
 - id: files
   uses: jitterbit/get-changed-files@v1
+  with:
+    format: 'csv'
 - run: |
     mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
     for added_modified_file in "${added_modified_files[@]}"; do
@@ -59,6 +61,8 @@ Consider using one of the other formats if that's the case.
 ```yaml
 - id: files
   uses: jitterbit/get-changed-files@v1
+  with:
+    format: 'json'
 - run: |
     readarray -t deleted_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.deleted }}')"
     for deleted_file in ${deleted_files[@]}; do
