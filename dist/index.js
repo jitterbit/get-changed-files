@@ -3480,7 +3480,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 function run() {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Create GitHub client with the API token.
@@ -3491,10 +3490,10 @@ function run() {
                 core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`);
             }
             // Debug log the payload
-            core.debug(`Payload: ${github_1.context.payload}`);
+            core.debug(`Payload keys: ${Object.keys(github_1.context.payload)}`);
             // Extract the base and head commits from the webhook payload.
-            const base = (_a = github_1.context.payload.base) === null || _a === void 0 ? void 0 : _a.sha;
-            const head = (_b = github_1.context.payload.head) === null || _b === void 0 ? void 0 : _b.sha;
+            const base = github_1.context.payload.before;
+            const head = github_1.context.payload.after;
             // Ensure that the base and head properties are set on the payload.
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +

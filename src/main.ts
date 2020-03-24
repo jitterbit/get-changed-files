@@ -16,11 +16,11 @@ async function run(): Promise<void> {
     }
 
     // Debug log the payload
-    core.debug(`Payload: ${context.payload}`)
+    core.debug(`Payload keys: ${Object.keys(context.payload)}`)
 
     // Extract the base and head commits from the webhook payload.
-    const base: string = context.payload.base?.sha
-    const head: string = context.payload.head?.sha
+    const base: string = context.payload.before
+    const head: string = context.payload.after
 
     // Ensure that the base and head properties are set on the payload.
     if (!base || !head) {
