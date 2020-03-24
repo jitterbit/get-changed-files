@@ -3480,6 +3480,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 function run() {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Create GitHub client with the API token.
@@ -3489,9 +3490,11 @@ function run() {
             if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
                 core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`);
             }
+            // Debug log the payload
+            core.debug(`Payload: ${github_1.context.payload}`);
             // Extract the base and head commits from the webhook payload.
-            const base = github_1.context.payload.before;
-            const head = github_1.context.payload.after;
+            const base = (_a = github_1.context.payload.base) === null || _a === void 0 ? void 0 : _a.sha;
+            const head = (_b = github_1.context.payload.head) === null || _b === void 0 ? void 0 : _b.sha;
             // Ensure that the base and head properties are set on the payload.
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +
@@ -3573,12 +3576,12 @@ function run() {
                     addedModifiedFormatted = JSON.stringify(addedModified);
                     break;
             }
-            // Debug log the output values.
-            core.debug(`All: ${allFormatted}`);
-            core.debug(`Added: ${addedFormatted}`);
-            core.debug(`Modified: ${modifiedFormatted}`);
-            core.debug(`Deleted: ${deletedFormatted}`);
-            core.debug(`Added or modified: ${addedModifiedFormatted}`);
+            // Log the output values.
+            core.info(`All: ${allFormatted}`);
+            core.info(`Added: ${addedFormatted}`);
+            core.info(`Modified: ${modifiedFormatted}`);
+            core.info(`Deleted: ${deletedFormatted}`);
+            core.info(`Added or modified: ${addedModifiedFormatted}`);
             // Set step output context.
             core.setOutput('all', allFormatted);
             core.setOutput('added', addedFormatted);
