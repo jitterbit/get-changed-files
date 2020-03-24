@@ -3521,17 +3521,25 @@ function run() {
             if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
                 core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`);
             }
-            // Debug log the payload
+            // Debug log the payload.
             core.debug(`Payload keys: ${Object.keys(github_1.context.payload)}`);
-            // Extract the base and head commits from the webhook payload.
-            let base = github_1.context.payload.before;
-            let head = github_1.context.payload.after;
-            // Private GHE repos use a different payload schema than public repos :exploding_head:
-            if (!base) {
-                base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
-            }
-            if (!head) {
-                head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
+            // Get event name.
+            const eventName = github_1.context.eventName;
+            // Define the base and head commits to be extracted from the payload.
+            let base;
+            let head;
+            switch (eventName) {
+                case 'pull_request':
+                    base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
+                    head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
+                    break;
+                case 'push':
+                    base = github_1.context.payload.before;
+                    head = github_1.context.payload.after;
+                    break;
+                default:
+                    core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
+                        "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             // Log the base and head commits
             core.info(`Base commit: ${base}`);
@@ -3540,6 +3548,9 @@ function run() {
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +
                     "Please submit an issue on this action's GitHub repo.");
+                // To satisfy TypeScript, even though this is unreachable.
+                base = '';
+                head = '';
             }
             // Use GitHub's compare two commits API.
             // https://developer.github.com/v3/repos/commits/#compare-two-commits

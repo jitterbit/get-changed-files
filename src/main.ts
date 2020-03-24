@@ -15,19 +15,30 @@ async function run(): Promise<void> {
       core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`)
     }
 
-    // Debug log the payload
+    // Debug log the payload.
     core.debug(`Payload keys: ${Object.keys(context.payload)}`)
 
-    // Extract the base and head commits from the webhook payload.
-    let base: string = context.payload.before
-    let head: string = context.payload.after
+    // Get event name.
+    const eventName = context.eventName
 
-    // Private GHE repos use a different payload schema than public repos :exploding_head:
-    if (!base) {
-      base = context.payload.pull_request?.base?.sha as string
-    }
-    if (!head) {
-      head = context.payload.pull_request?.head?.sha as string
+    // Define the base and head commits to be extracted from the payload.
+    let base: string | undefined
+    let head: string | undefined
+
+    switch (eventName) {
+      case 'pull_request':
+        base = context.payload.pull_request?.base?.sha
+        head = context.payload.pull_request?.head?.sha
+        break
+      case 'push':
+        base = context.payload.before
+        head = context.payload.after
+        break
+      default:
+        core.setFailed(
+          `This action only supports pull requests and pushes, ${context.eventName} events are not supported. ` +
+            "Please submit an issue on this action's GitHub repo if you believe this in correct."
+        )
     }
 
     // Log the base and head commits
@@ -40,6 +51,10 @@ async function run(): Promise<void> {
         `The base and head commits are missing from the payload for this ${context.eventName} event. ` +
           "Please submit an issue on this action's GitHub repo."
       )
+
+      // To satisfy TypeScript, even though this is unreachable.
+      base = ''
+      head = ''
     }
 
     // Use GitHub's compare two commits API.
