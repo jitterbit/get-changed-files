@@ -15,9 +15,12 @@ async function run(): Promise<void> {
       core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`)
     }
 
+    // Debug log the payload
+    core.debug(`Payload: ${context.payload}`)
+
     // Extract the base and head commits from the webhook payload.
-    const base: string = context.payload.before
-    const head: string = context.payload.after
+    const base: string = context.payload.base?.sha
+    const head: string = context.payload.head?.sha
 
     // Ensure that the base and head properties are set on the payload.
     if (!base || !head) {
@@ -126,12 +129,12 @@ async function run(): Promise<void> {
         break
     }
 
-    // Debug log the output values.
-    core.debug(`All: ${allFormatted}`)
-    core.debug(`Added: ${addedFormatted}`)
-    core.debug(`Modified: ${modifiedFormatted}`)
-    core.debug(`Deleted: ${deletedFormatted}`)
-    core.debug(`Added or modified: ${addedModifiedFormatted}`)
+    // Log the output values.
+    core.info(`All: ${allFormatted}`)
+    core.info(`Added: ${addedFormatted}`)
+    core.info(`Modified: ${modifiedFormatted}`)
+    core.info(`Deleted: ${deletedFormatted}`)
+    core.info(`Added or modified: ${addedModifiedFormatted}`)
 
     // Set step output context.
     core.setOutput('all', allFormatted)
