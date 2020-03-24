@@ -30,9 +30,9 @@ async function run(): Promise<void> {
       head = context.payload.pull_request?.head?.sha as string
     }
 
-    // Debug log the base and head commits
-    core.debug(`Base commit: ${base}`)
-    core.debug(`Head commit: ${head}`)
+    // Log the base and head commits
+    core.info(`Base commit: ${base}`)
+    core.info(`Head commit: ${head}`)
 
     // Ensure that the base and head properties are set on the payload.
     if (!base || !head) {

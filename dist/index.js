@@ -3502,9 +3502,9 @@ function run() {
             if (!head) {
                 head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
             }
-            // Debug log the base and head commits
-            core.debug(`Base commit: ${base}`);
-            core.debug(`Head commit: ${head}`);
+            // Log the base and head commits
+            core.info(`Base commit: ${base}`);
+            core.info(`Head commit: ${head}`);
             // Ensure that the base and head properties are set on the payload.
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +
