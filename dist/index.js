@@ -3480,6 +3480,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 function run() {
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Create GitHub client with the API token.
@@ -3492,8 +3493,18 @@ function run() {
             // Debug log the payload
             core.debug(`Payload keys: ${Object.keys(github_1.context.payload)}`);
             // Extract the base and head commits from the webhook payload.
-            const base = github_1.context.payload.before;
-            const head = github_1.context.payload.after;
+            let base = github_1.context.payload.before;
+            let head = github_1.context.payload.after;
+            // Private GHE repos use a different payload schema than public repos :exploding_head:
+            if (!base) {
+                base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
+            }
+            if (!head) {
+                head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
+            }
+            // Debug log the base and head commits
+            core.debug(`Base commit: ${base}`);
+            core.debug(`Head commit: ${head}`);
             // Ensure that the base and head properties are set on the payload.
             if (!base || !head) {
                 core.setFailed(`The base and head commits are missing from the payload for this ${github_1.context.eventName} event. ` +

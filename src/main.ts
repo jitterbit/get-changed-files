@@ -19,8 +19,20 @@ async function run(): Promise<void> {
     core.debug(`Payload keys: ${Object.keys(context.payload)}`)
 
     // Extract the base and head commits from the webhook payload.
-    const base: string = context.payload.before
-    const head: string = context.payload.after
+    let base: string = context.payload.before
+    let head: string = context.payload.after
+
+    // Private GHE repos use a different payload schema than public repos :exploding_head:
+    if (!base) {
+      base = context.payload.pull_request?.base?.sha as string
+    }
+    if (!head) {
+      head = context.payload.pull_request?.head?.sha as string
+    }
+
+    // Debug log the base and head commits
+    core.debug(`Base commit: ${base}`)
+    core.debug(`Head commit: ${head}`)
 
     // Ensure that the base and head properties are set on the payload.
     if (!base || !head) {
