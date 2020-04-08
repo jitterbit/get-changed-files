@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 
 type Format = 'space-delimited' | 'csv' | 'json'
-type FileStatus = 'added' | 'modified' | 'removed'
+type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
 
 async function run(): Promise<void> {
   try {
@@ -88,6 +88,7 @@ async function run(): Promise<void> {
       added = [] as string[],
       modified = [] as string[],
       deleted = [] as string[],
+      renamed = [] as string[],
       addedModified = [] as string[]
     for (const file of files) {
       const filename = file.filename
@@ -112,9 +113,12 @@ async function run(): Promise<void> {
         case 'removed':
           deleted.push(filename)
           break
+        case 'renamed':
+          renamed.push(filename)
+          break
         default:
           core.setFailed(
-            `One of your files includes an unsupported file status ${file.status}, expected 'added', 'modified', or 'removed'.`
+            `One of your files includes an unsupported file status '${file.status}', expected 'added', 'modified', or 'removed'.`
           )
       }
     }
@@ -124,6 +128,7 @@ async function run(): Promise<void> {
       addedFormatted: string,
       modifiedFormatted: string,
       deletedFormatted: string,
+      renamedFormatted: string,
       addedModifiedFormatted: string
     switch (format) {
       case 'space-delimited':
@@ -138,6 +143,7 @@ async function run(): Promise<void> {
         addedFormatted = added.join(' ')
         modifiedFormatted = modified.join(' ')
         deletedFormatted = deleted.join(' ')
+        renamedFormatted = renamed.join(' ')
         addedModifiedFormatted = addedModified.join(' ')
         break
       case 'csv':
@@ -145,6 +151,7 @@ async function run(): Promise<void> {
         addedFormatted = added.join(',')
         modifiedFormatted = modified.join(',')
         deletedFormatted = deleted.join(',')
+        renamedFormatted = renamed.join(',')
         addedModifiedFormatted = addedModified.join(',')
         break
       case 'json':
@@ -152,6 +159,7 @@ async function run(): Promise<void> {
         addedFormatted = JSON.stringify(added)
         modifiedFormatted = JSON.stringify(modified)
         deletedFormatted = JSON.stringify(deleted)
+        renamedFormatted = JSON.stringify(renamed)
         addedModifiedFormatted = JSON.stringify(addedModified)
         break
     }
@@ -161,6 +169,7 @@ async function run(): Promise<void> {
     core.info(`Added: ${addedFormatted}`)
     core.info(`Modified: ${modifiedFormatted}`)
     core.info(`Deleted: ${deletedFormatted}`)
+    core.info(`Renamed: ${renamedFormatted}`)
     core.info(`Added or modified: ${addedModifiedFormatted}`)
 
     // Set step output context.
@@ -168,6 +177,7 @@ async function run(): Promise<void> {
     core.setOutput('added', addedFormatted)
     core.setOutput('modified', modifiedFormatted)
     core.setOutput('deleted', deletedFormatted)
+    core.setOutput('renamed', renamedFormatted)
     core.setOutput('added_modified', addedModifiedFormatted)
   } catch (error) {
     core.setFailed(error.message)

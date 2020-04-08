@@ -7,7 +7,7 @@
 Get all of the files changed/modified in a pull request or push's commits.
 You can choose to get all changed files, only added files, only modified files, only deleted files, or all added and modified files.
 These outputs are available via the `steps` output context.
-The `steps` output context exposes the output names `all`, `added`, `modified`, `deleted`, and `added_modified`.
+The `steps` output context exposes the output names `all`, `added`, `modified`, `deleted`, `renamed`, and `added_modified`.
 
 # Usage
 

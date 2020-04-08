@@ -3572,7 +3572,7 @@ function run() {
             }
             // Get the changed files from the response payload.
             const files = response.data.files;
-            const all = [], added = [], modified = [], deleted = [], addedModified = [];
+            const all = [], added = [], modified = [], deleted = [], renamed = [], addedModified = [];
             for (const file of files) {
                 const filename = file.filename;
                 // If we're using the 'space-delimited' format and any of the filenames have a space in them,
@@ -3594,12 +3594,15 @@ function run() {
                     case 'removed':
                         deleted.push(filename);
                         break;
+                    case 'renamed':
+                        renamed.push(filename);
+                        break;
                     default:
-                        core.setFailed(`One of your files includes an unsupported file status ${file.status}, expected 'added', 'modified', or 'removed'.`);
+                        core.setFailed(`One of your files includes an unsupported file status '${file.status}', expected 'added', 'modified', or 'removed'.`);
                 }
             }
             // Format the arrays of changed files.
-            let allFormatted, addedFormatted, modifiedFormatted, deletedFormatted, addedModifiedFormatted;
+            let allFormatted, addedFormatted, modifiedFormatted, deletedFormatted, renamedFormatted, addedModifiedFormatted;
             switch (format) {
                 case 'space-delimited':
                     // If any of the filenames have a space in them, then fail the step.
@@ -3611,6 +3614,7 @@ function run() {
                     addedFormatted = added.join(' ');
                     modifiedFormatted = modified.join(' ');
                     deletedFormatted = deleted.join(' ');
+                    renamedFormatted = renamed.join(' ');
                     addedModifiedFormatted = addedModified.join(' ');
                     break;
                 case 'csv':
@@ -3618,6 +3622,7 @@ function run() {
                     addedFormatted = added.join(',');
                     modifiedFormatted = modified.join(',');
                     deletedFormatted = deleted.join(',');
+                    renamedFormatted = renamed.join(',');
                     addedModifiedFormatted = addedModified.join(',');
                     break;
                 case 'json':
@@ -3625,6 +3630,7 @@ function run() {
                     addedFormatted = JSON.stringify(added);
                     modifiedFormatted = JSON.stringify(modified);
                     deletedFormatted = JSON.stringify(deleted);
+                    renamedFormatted = JSON.stringify(renamed);
                     addedModifiedFormatted = JSON.stringify(addedModified);
                     break;
             }
@@ -3633,12 +3639,14 @@ function run() {
             core.info(`Added: ${addedFormatted}`);
             core.info(`Modified: ${modifiedFormatted}`);
             core.info(`Deleted: ${deletedFormatted}`);
+            core.info(`Renamed: ${renamedFormatted}`);
             core.info(`Added or modified: ${addedModifiedFormatted}`);
             // Set step output context.
             core.setOutput('all', allFormatted);
             core.setOutput('added', addedFormatted);
             core.setOutput('modified', modifiedFormatted);
             core.setOutput('deleted', deletedFormatted);
+            core.setOutput('renamed', renamedFormatted);
             core.setOutput('added_modified', addedModifiedFormatted);
         }
         catch (error) {

@@ -33,6 +33,9 @@ outputs:
   deleted:
     description: >
       Array of deleted files.
+  renamed:
+    description: >
+      Array of renamed files.
   added_modified:
     description: >
       Array of all added and modified files.
