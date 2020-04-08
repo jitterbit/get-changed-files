@@ -3572,7 +3572,7 @@ function run() {
             }
             // Get the changed files from the response payload.
             const files = response.data.files;
-            const all = [], added = [], modified = [], deleted = [], renamed = [], addedModified = [];
+            const all = [], added = [], modified = [], removed = [], renamed = [], addedModified = [];
             for (const file of files) {
                 const filename = file.filename;
                 // If we're using the 'space-delimited' format and any of the filenames have a space in them,
@@ -3592,17 +3592,17 @@ function run() {
                         addedModified.push(filename);
                         break;
                     case 'removed':
-                        deleted.push(filename);
+                        removed.push(filename);
                         break;
                     case 'renamed':
                         renamed.push(filename);
                         break;
                     default:
-                        core.setFailed(`One of your files includes an unsupported file status '${file.status}', expected 'added', 'modified', or 'removed'.`);
+                        core.setFailed(`One of your files includes an unsupported file status '${file.status}', expected 'added', 'modified', 'removed', or 'renamed'.`);
                 }
             }
             // Format the arrays of changed files.
-            let allFormatted, addedFormatted, modifiedFormatted, deletedFormatted, renamedFormatted, addedModifiedFormatted;
+            let allFormatted, addedFormatted, modifiedFormatted, removedFormatted, renamedFormatted, addedModifiedFormatted;
             switch (format) {
                 case 'space-delimited':
                     // If any of the filenames have a space in them, then fail the step.
@@ -3613,7 +3613,7 @@ function run() {
                     allFormatted = all.join(' ');
                     addedFormatted = added.join(' ');
                     modifiedFormatted = modified.join(' ');
-                    deletedFormatted = deleted.join(' ');
+                    removedFormatted = removed.join(' ');
                     renamedFormatted = renamed.join(' ');
                     addedModifiedFormatted = addedModified.join(' ');
                     break;
@@ -3621,7 +3621,7 @@ function run() {
                     allFormatted = all.join(',');
                     addedFormatted = added.join(',');
                     modifiedFormatted = modified.join(',');
-                    deletedFormatted = deleted.join(',');
+                    removedFormatted = removed.join(',');
                     renamedFormatted = renamed.join(',');
                     addedModifiedFormatted = addedModified.join(',');
                     break;
@@ -3629,7 +3629,7 @@ function run() {
                     allFormatted = JSON.stringify(all);
                     addedFormatted = JSON.stringify(added);
                     modifiedFormatted = JSON.stringify(modified);
-                    deletedFormatted = JSON.stringify(deleted);
+                    removedFormatted = JSON.stringify(removed);
                     renamedFormatted = JSON.stringify(renamed);
                     addedModifiedFormatted = JSON.stringify(addedModified);
                     break;
@@ -3638,16 +3638,18 @@ function run() {
             core.info(`All: ${allFormatted}`);
             core.info(`Added: ${addedFormatted}`);
             core.info(`Modified: ${modifiedFormatted}`);
-            core.info(`Deleted: ${deletedFormatted}`);
+            core.info(`Removed: ${removedFormatted}`);
             core.info(`Renamed: ${renamedFormatted}`);
             core.info(`Added or modified: ${addedModifiedFormatted}`);
             // Set step output context.
             core.setOutput('all', allFormatted);
             core.setOutput('added', addedFormatted);
             core.setOutput('modified', modifiedFormatted);
-            core.setOutput('deleted', deletedFormatted);
+            core.setOutput('removed', removedFormatted);
             core.setOutput('renamed', renamedFormatted);
             core.setOutput('added_modified', addedModifiedFormatted);
+            // For backwards-compatibility
+            core.setOutput('deleted', removedFormatted);
         }
         catch (error) {
             core.setFailed(error.message);

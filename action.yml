@@ -30,12 +30,16 @@ outputs:
   modified:
     description: >
       Array of modified files.
-  deleted:
+  removed:
     description: >
-      Array of deleted files.
+      Array of removed files.
   renamed:
     description: >
       Array of renamed files.
   added_modified:
     description: >
       Array of all added and modified files.
+  # For backwards-compatibility
+  deleted:
+    description: >
+      Array of deleted files.
