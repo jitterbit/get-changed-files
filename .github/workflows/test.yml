@@ -85,13 +85,12 @@ jobs:
       - id: files
         name: Run the action
         uses: ./
-        with:
-          disk: true
 
       - name: Print steps context output
         run: |
           echo 'steps.files.outputs.all=${{ steps.files.outputs.all }}'
           echo 'steps.files.outputs.added=${{ steps.files.outputs.added }}'
-          echo 'steps.files.outputs.deleted=${{ steps.files.outputs.deleted }}'
           echo 'steps.files.outputs.modified=${{ steps.files.outputs.modified }}'
+          echo 'steps.files.outputs.deleted=${{ steps.files.outputs.deleted }}'
+          echo 'steps.files.outputs.renamed=${{ steps.files.outputs.renamed }}'
           echo 'steps.files.outputs.added_modified=${{ steps.files.outputs.added_modified }}'
