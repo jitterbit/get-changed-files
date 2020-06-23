@@ -2,6 +2,8 @@
   <a href="https://github.com/jitterbit/get-changed-files/actions"><img alt="jitterbit/get-changed-files status" src="https://github.com/jitterbit/get-changed-files/workflows/Test/badge.svg"></a>
 </p>
 
+Debug PR build
+
 # Get All Changed Files
 
 Get all of the files changed/modified in a pull request or push's commits.
