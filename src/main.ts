@@ -9,6 +9,7 @@ async function run(): Promise<void> {
     // Create GitHub client with the API token.
     const client = new GitHub(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
+    const filter = core.getInput('filter', {required: true}) || '*'
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
@@ -83,8 +84,9 @@ async function run(): Promise<void> {
       )
     }
 
+    const regex = new RegExp(`/${filter}\\b`, 'g')
     // Get the changed files from the response payload.
-    const files = response.data.files
+    const files = response.data.files.filter(file => file.filename.match(regex))
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
