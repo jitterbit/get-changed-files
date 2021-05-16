@@ -14,6 +14,11 @@ inputs:
       Users shouldn't need to set this themselves.
     required: true
     default: ${{ github.token }}
+  ignoreFile:
+    description: >
+      Filepath containing a list of files to ignore.
+      require:false;
+      default: ''
   format:
     description: >
       Format of the steps output context.

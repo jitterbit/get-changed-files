@@ -1,5 +1,8 @@
 import * as core from '@actions/core'
-import {context, GitHub} from '@actions/github'
+
+import {GitHub, context} from '@actions/github'
+
+import {promises as fs} from 'fs'
 
 type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
@@ -45,6 +48,14 @@ async function run(): Promise<void> {
     core.info(`Base commit: ${base}`)
     core.info(`Head commit: ${head}`)
 
+    const ignoreFilePath = core.getInput('ignoreFile', {required: false}) as string
+    let ignoreList: string[] = []
+    if (ignoreFilePath !== '') {
+      const ignoreFile = await fs.readFile(ignoreFilePath, 'utf8')
+      ignoreList = ignoreFile.split('\n')
+      core.info('ignoreList: ' + ignoreList.join(' '))
+    }
+
     // Ensure that the base and head properties are set on the payload.
     if (!base || !head) {
       core.setFailed(
@@ -83,7 +94,8 @@ async function run(): Promise<void> {
     }
 
     // Get the changed files from the response payload.
-    const files = response.data.files
+    const files = response.data.files.filter(file => !ignoreList.includes(file.filename))
+
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
