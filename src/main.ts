@@ -26,6 +26,7 @@ async function run(): Promise<void> {
     let head: string | undefined
 
     switch (eventName) {
+      case 'pull_request_target':
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
         head = context.payload.pull_request?.head?.sha
