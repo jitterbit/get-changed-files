@@ -20,6 +20,9 @@ inputs:
       Can be 'space-delimited', 'csv', or 'json'.
     required: true
     default: space-delimited
+  filter:
+    required: true
+    default: '*'
 outputs:
   all:
     description: >
