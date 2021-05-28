@@ -3529,6 +3529,7 @@ function run() {
             let base;
             let head;
             switch (eventName) {
+                case 'pull_request_target':
                 case 'pull_request':
                     base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
                     head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
@@ -3563,11 +3564,6 @@ function run() {
             // Ensure that the request was successful.
             if (response.status !== 200) {
                 core.setFailed(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
-                    "Please submit an issue on this action's GitHub repo.");
-            }
-            // Ensure that the head commit is ahead of the base commit.
-            if (response.data.status !== 'ahead') {
-                core.setFailed(`The head commit for this ${github_1.context.eventName} event is not ahead of the base commit. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
             // Get the changed files from the response payload.

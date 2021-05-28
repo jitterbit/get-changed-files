@@ -26,6 +26,7 @@ async function run(): Promise<void> {
     let head: string | undefined
 
     switch (eventName) {
+      case 'pull_request_target':
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
         head = context.payload.pull_request?.head?.sha
@@ -70,14 +71,6 @@ async function run(): Promise<void> {
     if (response.status !== 200) {
       core.setFailed(
         `The GitHub API for comparing the base and head commits for this ${context.eventName} event returned ${response.status}, expected 200. ` +
-          "Please submit an issue on this action's GitHub repo."
-      )
-    }
-
-    // Ensure that the head commit is ahead of the base commit.
-    if (response.data.status !== 'ahead') {
-      core.setFailed(
-        `The head commit for this ${context.eventName} event is not ahead of the base commit. ` +
           "Please submit an issue on this action's GitHub repo."
       )
     }
