@@ -39,7 +39,7 @@
     "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package && yarn test"
   },
   "dependencies": {
-    "@actions/core": "^1.2.2",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^2.1.0"
   },
   "devDependencies": {
