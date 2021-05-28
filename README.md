@@ -20,6 +20,8 @@ See [action.yml](action.yml)
     # Can be 'space-delimited', 'csv', or 'json'.
     # Default: 'space-delimited'
     format: ''
+    # Filter files using a regex
+    filter: '*'
 ```
 
 # Scenarios
@@ -36,6 +38,8 @@ Consider using one of the other formats if that's the case.
 ```yaml
 - id: files
   uses: jitterbit/get-changed-files@v1
+  with:
+    filter: '*.php'
 - run: |
     for changed_file in ${{ steps.files.outputs.all }}; do
       echo "Do something with this ${changed_file}."
