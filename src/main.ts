@@ -74,14 +74,6 @@ async function run(): Promise<void> {
       )
     }
 
-    // Ensure that the head commit is ahead of the base commit.
-    if (response.data.status !== 'ahead') {
-      core.setFailed(
-        `The head commit for this ${context.eventName} event is not ahead of the base commit. ` +
-          "Please submit an issue on this action's GitHub repo."
-      )
-    }
-
     // Get the changed files from the response payload.
     const files = response.data.files
     const all = [] as string[],

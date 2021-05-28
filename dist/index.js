@@ -3565,11 +3565,6 @@ function run() {
                 core.setFailed(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
                     "Please submit an issue on this action's GitHub repo.");
             }
-            // Ensure that the head commit is ahead of the base commit.
-            if (response.data.status !== 'ahead') {
-                core.setFailed(`The head commit for this ${github_1.context.eventName} event is not ahead of the base commit. ` +
-                    "Please submit an issue on this action's GitHub repo.");
-            }
             // Get the changed files from the response payload.
             const files = response.data.files;
             const all = [], added = [], modified = [], removed = [], renamed = [], addedModified = [];
