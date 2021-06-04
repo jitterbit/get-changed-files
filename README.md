@@ -1,7 +1,7 @@
 [![CI status](https://github.com/Ana06/get-changed-files/workflows/Test/badge.svg)](https://github.com/Ana06/get-changed-files/actions?query=event%3Apush+branch%3Amain)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
-This project is a fork of https://github.com/jitterbit/get-changed-files, which supports `pull_request_target` and allow to filter files using regular expressions.
+This project is a fork of https://github.com/jitterbit/get-changed-files, which supports `pull_request_target`, allow to filter files using regular expressions and removes the ahead check.
 
 # Get All Changed Files
 
@@ -15,7 +15,7 @@ The `steps` output context exposes the output names `all`, `added`, `modified`, 
 See [action.yml](action.yml)
 
 ```yaml
-- uses: Ana06/get-changed-files@v1.1
+- uses: Ana06/get-changed-files@v1.2
   with:
     # Format of the steps output context.
     # Can be 'space-delimited', 'csv', or 'json'.
@@ -38,7 +38,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: Ana06/get-changed-files@v1.1
+  uses: Ana06/get-changed-files@v1.2
   with:
     filter: '*.php'
 - run: |
@@ -51,7 +51,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: Ana06/get-changed-files@v1.1
+  uses: Ana06/get-changed-files@v1.2
   with:
     format: 'csv'
 - run: |
@@ -65,7 +65,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: Ana06/get-changed-files@v1.1
+  uses: Ana06/get-changed-files@v1.2
   with:
     format: 'json'
 - run: |
