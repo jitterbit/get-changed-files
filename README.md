@@ -65,7 +65,7 @@ Consider using one of the other formats if that's the case.
     format: 'json'
 - run: |
     readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
-    for removed_file in ${removed_files[@]}; do
+    for removed_file in "${removed_files[@]}"; do
       echo "Do something with this ${removed_file}."
     done
 ```
