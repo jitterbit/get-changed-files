@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
+import minimatch from 'minimatch'
 
 type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
@@ -9,7 +10,7 @@ async function run(): Promise<void> {
     // Create GitHub client with the API token.
     const client = new GitHub(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
-    const filter = core.getInput('filter', {required: true}) || '*'
+    const filter = core.getMultilineInput('filter', {required: true}) || '*'
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
@@ -76,9 +77,22 @@ async function run(): Promise<void> {
       )
     }
 
-    const regex = new RegExp(`/${filter}\\b`, 'g')
-    // Get the changed files from the response payload.
-    const files = response.data.files.filter(file => file.filename.match(regex))
+    const files = response.data.files.filter(file => {
+      let match = false
+      for (const item of filter) {
+        const pattern = item
+        core.debug(`Test ${file.filename} against ${pattern}`)
+        core.debug(`current match value: ${match}`)
+        if (pattern.startsWith('!')) {
+          match = match && minimatch(file.filename, pattern, {matchBase: true, dot: true})
+        } else {
+          match = match || minimatch(file.filename, pattern, {matchBase: true, dot: true})
+        }
+        core.debug(`match: ${match}`)
+      }
+      return match
+    })
+
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
