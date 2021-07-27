@@ -86,7 +86,7 @@ jobs:
         name: Run the action
         uses: ./
         with:
-          glob-filter: '*'
+          filter: '*'
 
       - name: Print files
         run: |
@@ -101,7 +101,7 @@ jobs:
         name: Run the action
         uses: ./
         with:
-          glob-filter: |
+          filter: |
             *.yml
             !.github/*/*.yml
             *.js
