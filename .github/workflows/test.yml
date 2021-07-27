@@ -83,10 +83,7 @@ jobs:
         uses: actions/checkout@v2
 
       - id: files
-        name: Run the action
-        uses: ./
-        with:
-          filter: '*'
+        name: Run the action without filtering
 
       - name: Print files
         run: |
@@ -96,10 +93,9 @@ jobs:
           echo 'steps.files.outputs.removed=${{ steps.files.outputs.removed }}'
           echo 'steps.files.outputs.renamed=${{ steps.files.outputs.renamed }}'
           echo 'steps.files.outputs.added_modified=${{ steps.files.outputs.added_modified }}'
-          
+
       - id: files-filtered
-        name: Run the action
-        uses: ./
+        name: Run the action with filtering
         with:
           filter: |
             *.yml
@@ -108,7 +104,6 @@ jobs:
             *.ts
             package*
             !*.json
-            
 
       - name: Print files-filtered
         run: |
@@ -118,4 +113,4 @@ jobs:
           echo 'steps.files-filtered.outputs.removed=${{ steps.files-filtered.outputs.removed }}'
           echo 'steps.files-filtered.outputs.renamed=${{ steps.files-filtered.outputs.renamed }}'
           echo 'steps.files-filtered.outputs.added_modified=${{ steps.files-filtered.outputs.added_modified }}'
-        
+
