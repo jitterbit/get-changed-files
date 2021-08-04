@@ -87,7 +87,7 @@ async function run(): Promise<void> {
     for (const file of files) {
       let filename = file.filename
       if (absolute) {
-        filename = path.join(process.env.GITHUB_WORKSPACE, filename)
+        filename = path.join(process.env.GITHUB_WORKSPACE || '', filename)
       }
       // If we're using the 'space-delimited' format and any of the filenames have a space in them,
       // then fail the step.
