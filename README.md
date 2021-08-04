@@ -1,10 +1,11 @@
-<p align="center">
-  <a href="https://github.com/jitterbit/get-changed-files/actions"><img alt="jitterbit/get-changed-files status" src="https://github.com/jitterbit/get-changed-files/workflows/Test/badge.svg"></a>
-</p>
+[![CI status](https://github.com/Ana06/get-changed-files/workflows/Test/badge.svg)](https://github.com/Ana06/get-changed-files/actions?query=event%3Apush+branch%3Amain)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
+
+This project is a fork of https://github.com/jitterbit/get-changed-files, which supports `pull_request_target`, allow to filter files using regular expressions and removes the ahead check.
 
 # Get All Changed Files
 
-Get all of the files changed/modified in a pull request or push's commits.
+Get all of the files changed/modified in a pull request (`pull_request` or `pull_request_target`) or push's commits.
 You can choose to get all changed files, only added files, only modified files, only removed files, only renamed files, or all added and modified files.
 These outputs are available via the `steps` output context.
 The `steps` output context exposes the output names `all`, `added`, `modified`, `removed`, `renamed`, and `added_modified`.
@@ -14,12 +15,14 @@ The `steps` output context exposes the output names `all`, `added`, `modified`, 
 See [action.yml](action.yml)
 
 ```yaml
-- uses: jitterbit/get-changed-files@v1
+- uses: Ana06/get-changed-files@v1.2
   with:
     # Format of the steps output context.
     # Can be 'space-delimited', 'csv', or 'json'.
     # Default: 'space-delimited'
     format: ''
+    # Filter files using a regex
+    filter: '*'
 ```
 
 # Scenarios
@@ -35,7 +38,9 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: Ana06/get-changed-files@v1.2
+  with:
+    filter: '*.php'
 - run: |
     for changed_file in ${{ steps.files.outputs.all }}; do
       echo "Do something with this ${changed_file}."
@@ -46,7 +51,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: Ana06/get-changed-files@v1.2
   with:
     format: 'csv'
 - run: |
@@ -60,7 +65,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: Ana06/get-changed-files@v1.2
   with:
     format: 'json'
 - run: |

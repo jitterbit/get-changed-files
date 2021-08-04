@@ -11,6 +11,7 @@ async function run(): Promise<void> {
     const client = new GitHub(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
     const absolute = !!core.getInput('absolute', {required: false})
+    const filter = core.getInput('filter', {required: true}) || '*'
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
@@ -28,6 +29,7 @@ async function run(): Promise<void> {
     let head: string | undefined
 
     switch (eventName) {
+      case 'pull_request_target':
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
         head = context.payload.pull_request?.head?.sha
@@ -76,8 +78,9 @@ async function run(): Promise<void> {
       )
     }
 
+    const regex = new RegExp(`/${filter}\\b`, 'g')
     // Get the changed files from the response payload.
-    const files = response.data.files
+    const files = response.data.files.filter(file => file.filename.match(regex))
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
