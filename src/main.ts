@@ -46,7 +46,7 @@ async function run(): Promise<void> {
     }
 
     // Log the base ref and head commit
-    core.info(`Base commit: ${base}`)
+    core.info(`Base ref: ${base}`)
     core.info(`Head commit: ${head}`)
 
     // Ensure that the base and head properties are set on the payload.
