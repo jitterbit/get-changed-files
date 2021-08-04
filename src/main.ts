@@ -1,5 +1,7 @@
+import path from 'path'
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
+import minimatch from 'minimatch'
 
 type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
@@ -9,6 +11,8 @@ async function run(): Promise<void> {
     // Create GitHub client with the API token.
     const client = new GitHub(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
+    const absolute = !!core.getInput('absolute', {required: false})
+    const filter = core.getMultilineInput('filter', {required: true}) || '*'
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
@@ -26,8 +30,9 @@ async function run(): Promise<void> {
     let head: string | undefined
 
     switch (eventName) {
+      case 'pull_request_target':
       case 'pull_request':
-        base = context.payload.pull_request?.base?.sha
+        base = context.payload.pull_request?.base?.ref
         head = context.payload.pull_request?.head?.sha
         break
       case 'push':
@@ -41,8 +46,8 @@ async function run(): Promise<void> {
         )
     }
 
-    // Log the base and head commits
-    core.info(`Base commit: ${base}`)
+    // Log the base ref and head commit
+    core.info(`Base ref: ${base}`)
     core.info(`Head commit: ${head}`)
 
     // Ensure that the base and head properties are set on the payload.
@@ -53,8 +58,7 @@ async function run(): Promise<void> {
       )
 
       // To satisfy TypeScript, even though this is unreachable.
-      base = ''
-      head = ''
+      process.exit(1)
     }
 
     // Use GitHub's compare two commits API.
@@ -74,16 +78,22 @@ async function run(): Promise<void> {
       )
     }
 
-    // Ensure that the head commit is ahead of the base commit.
-    if (response.data.status !== 'ahead') {
-      core.setFailed(
-        `The head commit for this ${context.eventName} event is not ahead of the base commit. ` +
-          "Please submit an issue on this action's GitHub repo."
-      )
-    }
+    const files = response.data.files.filter(file => {
+      let match = false
+      for (const item of filter) {
+        const pattern = item
+        core.debug(`Test ${file.filename} against ${pattern}`)
+        core.debug(`current match value: ${match}`)
+        if (pattern.startsWith('!')) {
+          match = match && minimatch(file.filename, pattern, {matchBase: true, dot: true})
+        } else {
+          match = match || minimatch(file.filename, pattern, {matchBase: true, dot: true})
+        }
+        core.debug(`match: ${match}`)
+      }
+      return match
+    })
 
-    // Get the changed files from the response payload.
-    const files = response.data.files
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
@@ -91,7 +101,10 @@ async function run(): Promise<void> {
       renamed = [] as string[],
       addedModified = [] as string[]
     for (const file of files) {
-      const filename = file.filename
+      let filename = file.filename
+      if (absolute) {
+        filename = path.join(process.env.GITHUB_WORKSPACE || '', filename)
+      }
       // If we're using the 'space-delimited' format and any of the filenames have a space in them,
       // then fail the step.
       if (format === 'space-delimited' && filename.includes(' ')) {

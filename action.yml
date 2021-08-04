@@ -1,5 +1,5 @@
-name: Get All Changed Files
-description: Get all of the files changed/modified in a pull request or push's commits.
+name: Get Changed Files
+description: Get all files changed/modified in a pull request or push's commits. This project is a fork of https://github.com/jitterbit/get-changedfiles, which supports pull_request_target and allow to filter files using regular expressions
 author: Jitterbit, Inc.
 branding:
   icon: file
@@ -20,6 +20,14 @@ inputs:
       Can be 'space-delimited', 'csv', or 'json'.
     required: true
     default: space-delimited
+  absolute:
+    description: >
+      Prepend the workspace root to the file paths.
+      Useful if you're checking them out.
+    required: false
+  filter:
+    required: true
+    default: '*'
 outputs:
   all:
     description: >
