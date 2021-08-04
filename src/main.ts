@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     switch (eventName) {
       case 'pull_request_target':
       case 'pull_request':
-        base = context.payload.pull_request?.base?.sha
+        base = context.payload.pull_request?.base?.ref
         head = context.payload.pull_request?.head?.sha
         break
       case 'push':
@@ -45,7 +45,7 @@ async function run(): Promise<void> {
         )
     }
 
-    // Log the base and head commits
+    // Log the base ref and head commit
     core.info(`Base commit: ${base}`)
     core.info(`Head commit: ${head}`)
 
@@ -57,8 +57,7 @@ async function run(): Promise<void> {
       )
 
       // To satisfy TypeScript, even though this is unreachable.
-      base = ''
-      head = ''
+      process.exit(1)
     }
 
     // Use GitHub's compare two commits API.
