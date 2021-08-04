@@ -1,3 +1,4 @@
+import path from 'path'
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 
@@ -9,6 +10,7 @@ async function run(): Promise<void> {
     // Create GitHub client with the API token.
     const client = new GitHub(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
+    const absolute = !!core.getInput('absolute', {required: false})
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
@@ -91,7 +93,10 @@ async function run(): Promise<void> {
       renamed = [] as string[],
       addedModified = [] as string[]
     for (const file of files) {
-      const filename = file.filename
+      let filename = file.filename
+      if (absolute) {
+        filename = path.join(process.env.GITHUB_WORKSPACE, filename)
+      }
       // If we're using the 'space-delimited' format and any of the filenames have a space in them,
       // then fail the step.
       if (format === 'space-delimited' && filename.includes(' ')) {

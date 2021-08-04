@@ -20,6 +20,11 @@ inputs:
       Can be 'space-delimited', 'csv', or 'json'.
     required: true
     default: space-delimited
+  absolute:
+    description: >
+      Prepend the workspace root to the file paths.
+      Useful if you're checking them out.
+    required: false
 outputs:
   all:
     description: >
