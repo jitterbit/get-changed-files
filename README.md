@@ -22,6 +22,29 @@ See [action.yml](action.yml)
     format: ''
 ```
 
+## Inputs
+
+|   Input       |    type    |  required     |  default                |  description                                  |
+|:-------------:|:-----------:|:-------------:|:----------------------:|:---------------------------------------------:|
+| token         |  `string`   |    `true`    | `${{ github.token }}`  | Github token used to accessing the repository |
+| format         |  `string`   |    `true`    | `space-delimited`  | Format of the steps output context.<br /> (Choices: 'space-delimited', 'csv', 'json') |
+
+
+
+## Outputs
+
+|   Output                                     |    type     |  Description                             |
+|:--------------------------------------------:|:-----------:|:----------------------------------------:|
+|  all                                         |  `string`    |  Array of all changed files.             |
+|  added                                       |  `string`    |  Array of added files                    |
+|  modified                                    |  `string`    |  Array of modified files.                |
+|  removed                                     |  `string`    |  Array of removed files.                 |
+|  renamed                                     |  `string`    |  Array of renamed files.                 |
+|  added_modified                              |  `string`    |  Array of all added and modified files.  |
+|  deleted <br />(For backwards-compatibility) |  `string`    |  Array of deleted files.                 |
+
+
+
 # Scenarios
 
 - [Get all changed files as space-delimited](#get-all-changed-files-as-space-delimited)
