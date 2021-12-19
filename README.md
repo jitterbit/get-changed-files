@@ -35,13 +35,13 @@ See [action.yml](action.yml)
 
 |   Output                                     |    type     |  Description                             |
 |:--------------------------------------------:|:-----------:|:----------------------------------------:|
-|  all                                         |  `array`    |  Array of all changed files.             |
-|  added                                       |  `array`    |  Array of added files                    |
-|  modified                                    |  `array`    |  Array of modified files.                |
-|  removed                                     |  `array`    |  Array of removed files.                 |
-|  renamed                                     |  `array`    |  Array of renamed files.                 |
-|  added_modified                              |  `array`    |  Array of all added and modified files.  |
-|  deleted <br />(For backwards-compatibility) |  `array`    |  Array of deleted files.                 |
+|  all                                         |  `string`    |  Array of all changed files.             |
+|  added                                       |  `string`    |  Array of added files                    |
+|  modified                                    |  `string`    |  Array of modified files.                |
+|  removed                                     |  `string`    |  Array of removed files.                 |
+|  renamed                                     |  `string`    |  Array of renamed files.                 |
+|  added_modified                              |  `string`    |  Array of all added and modified files.  |
+|  deleted <br />(For backwards-compatibility) |  `string`    |  Array of deleted files.                 |
 
 
 
