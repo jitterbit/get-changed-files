@@ -3534,7 +3534,7 @@ function run() {
                     head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
                     break;
                 case 'push':
-                    base = github_1.context.payload.before;
+                    base = core.getInput('base') || github_1.context.payload.before;
                     head = github_1.context.payload.after;
                     break;
                 default:

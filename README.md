@@ -70,6 +70,20 @@ Consider using one of the other formats if that's the case.
     done
 ```
 
+## Get all changed files from a specific commit SHA
+
+```yaml
+- id: files
+  uses: jitterbit/get-changed-files@v1
+  with:
+    base: '[sha]'
+- run: |
+    readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
+    for removed_file in ${removed_files[@]}; do
+      echo "Do something with this ${removed_file}."
+    done
+```
+
 # Install, Build, Lint, Test, and Package
 
 Make sure to do the following before checking in any code changes.
