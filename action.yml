@@ -20,6 +20,11 @@ inputs:
       Can be 'space-delimited', 'csv', or 'json'.
     required: true
     default: space-delimited
+  base:
+    description: >
+      It overrides the default base commit before comparing it to the current commit (HEAD) to determine the 
+      files that were changed.
+    required: false
 outputs:
   all:
     description: >

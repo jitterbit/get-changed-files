@@ -31,7 +31,7 @@ async function run(): Promise<void> {
         head = context.payload.pull_request?.head?.sha
         break
       case 'push':
-        base = context.payload.before
+        base = core.getInput('base') || context.payload.before
         head = context.payload.after
         break
       default:
