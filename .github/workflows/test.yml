@@ -86,7 +86,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - id: files
+      - id: files changes
         name: Run the action
         uses: ./
 
