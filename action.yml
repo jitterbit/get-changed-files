@@ -1,9 +1,6 @@
-name: Get All Changed Files
-description: Get all of the files changed/modified in a pull request or push's commits.
-author: Jitterbit, Inc.
-branding:
-  icon: file
-  color: purple
+name: Get Changed Files
+description: Get files changed/modified in a pull request or push.
+author: Jitterbit, Inc., Halas Labs, LLC
 runs:
   using: node12
   main: dist/index.js
@@ -39,7 +36,3 @@ outputs:
   added_modified:
     description: >
       Array of all added and modified files.
-  # For backwards-compatibility
-  deleted:
-    description: >
-      Array of deleted files.

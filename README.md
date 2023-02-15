@@ -1,10 +1,14 @@
-<p align="center">
-  <a href="https://github.com/jitterbit/get-changed-files/actions"><img alt="jitterbit/get-changed-files status" src="https://github.com/jitterbit/get-changed-files/workflows/Test/badge.svg"></a>
-</p>
+[![CI status](https://github.com/halaslabs/get-changed-files/workflows/CI/badge.svg)](https://github.com/halaslabs/get-changed-files/actions?query=event%3Apush+branch%3Amain)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
-# Get All Changed Files
 
-Get all of the files changed/modified in a pull request or push's commits.
+# Fork
+
+This action was forked from [jitterbit/get-changed-files](https://github.com/jitterbit/get-changed-files)
+
+# Get Changed Files
+
+Get files changed/modified in a pull request or push.
 You can choose to get all changed files, only added files, only modified files, only removed files, only renamed files, or all added and modified files.
 These outputs are available via the `steps` output context.
 The `steps` output context exposes the output names `all`, `added`, `modified`, `removed`, `renamed`, and `added_modified`.
@@ -14,7 +18,7 @@ The `steps` output context exposes the output names `all`, `added`, `modified`, 
 See [action.yml](action.yml)
 
 ```yaml
-- uses: jitterbit/get-changed-files@v1
+- uses: halaslabs/get-changed-files@v2
   with:
     # Format of the steps output context.
     # Can be 'space-delimited', 'csv', or 'json'.
@@ -35,7 +39,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: halaslabs/get-changed-files@v2
 - run: |
     for changed_file in ${{ steps.files.outputs.all }}; do
       echo "Do something with this ${changed_file}."
@@ -46,7 +50,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: halaslabs/get-changed-files@v2
   with:
     format: 'csv'
 - run: |
@@ -60,7 +64,7 @@ Consider using one of the other formats if that's the case.
 
 ```yaml
 - id: files
-  uses: jitterbit/get-changed-files@v1
+  uses: halaslabs/get-changed-files@v2
   with:
     format: 'json'
 - run: |

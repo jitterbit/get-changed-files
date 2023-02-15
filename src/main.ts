@@ -179,9 +179,6 @@ async function run(): Promise<void> {
     core.setOutput('removed', removedFormatted)
     core.setOutput('renamed', renamedFormatted)
     core.setOutput('added_modified', addedModifiedFormatted)
-
-    // For backwards-compatibility
-    core.setOutput('deleted', removedFormatted)
   } catch (error) {
     core.setFailed(error.message)
   }
