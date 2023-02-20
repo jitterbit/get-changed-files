@@ -1,9 +1,6 @@
 name: Get Changed Files
 description: Get files changed/modified in a pull request or push.
 author: Jitterbit, Inc., Halas Labs, LLC
-runs:
-  using: node12
-  main: dist/index.js
 inputs:
   token:
     description: >
@@ -36,3 +33,6 @@ outputs:
   added_modified:
     description: >
       Array of all added and modified files.
+runs:
+  using: node16
+  main: dist/index.js

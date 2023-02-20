@@ -1,18 +1,22 @@
 import * as core from '@actions/core'
-import {context, GitHub} from '@actions/github'
+import * as github from '@actions/github'
 
 type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
 
 async function run(): Promise<void> {
   try {
+    const context = github.context
+
     // Create GitHub client with the API token.
-    const client = new GitHub(core.getInput('token', {required: true}))
+    const client = github.getOctokit(core.getInput('token', {required: true}))
     const format = core.getInput('format', {required: true}) as Format
 
     // Ensure that the format parameter is set properly.
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
-      core.setFailed(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`)
+      core.setFailed(
+        `Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`
+      )
     }
 
     // Debug log the payload.
@@ -59,7 +63,7 @@ async function run(): Promise<void> {
 
     // Use GitHub's compare two commits API.
     // https://developer.github.com/v3/repos/commits/#compare-two-commits
-    const response = await client.repos.compareCommits({
+    const response = await client.rest.repos.compareCommits({
       base,
       head,
       owner: context.repo.owner,
@@ -84,12 +88,20 @@ async function run(): Promise<void> {
 
     // Get the changed files from the response payload.
     const files = response.data.files
+
+    //check if files is undefined
+    if (files === undefined) {
+      core.setFailed('Error pulling files from response payload.')
+      return
+    }
+
     const all = [] as string[],
       added = [] as string[],
       modified = [] as string[],
       removed = [] as string[],
       renamed = [] as string[],
       addedModified = [] as string[]
+
     for (const file of files) {
       const filename = file.filename
       // If we're using the 'space-delimited' format and any of the filenames have a space in them,
@@ -180,7 +192,7 @@ async function run(): Promise<void> {
     core.setOutput('renamed', renamedFormatted)
     core.setOutput('added_modified', addedModifiedFormatted)
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
