@@ -95,12 +95,12 @@ async function run(): Promise<void> {
       return
     }
 
-    const all = [] as string[],
-      added = [] as string[],
-      modified = [] as string[],
-      removed = [] as string[],
-      renamed = [] as string[],
-      addedModified = [] as string[]
+    const all = [] as string[]
+    const added = [] as string[]
+    const modified = [] as string[]
+    const removed = [] as string[]
+    const renamed = [] as string[]
+    const addedModified = [] as string[]
 
     for (const file of files) {
       const filename = file.filename
@@ -136,12 +136,12 @@ async function run(): Promise<void> {
     }
 
     // Format the arrays of changed files.
-    let allFormatted: string,
-      addedFormatted: string,
-      modifiedFormatted: string,
-      removedFormatted: string,
-      renamedFormatted: string,
-      addedModifiedFormatted: string
+    let allFormatted: string
+    let addedFormatted: string
+    let modifiedFormatted: string
+    let removedFormatted: string
+    let renamedFormatted: string
+    let addedModifiedFormatted: string
     switch (format) {
       case 'space-delimited':
         // If any of the filenames have a space in them, then fail the step.
