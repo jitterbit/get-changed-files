@@ -1,23 +1,15 @@
 import * as core from '@actions/core'
+import * as input from './input'
 import * as github from '@actions/github'
 
-type Format = 'space-delimited' | 'csv' | 'json'
 type FileStatus = 'added' | 'modified' | 'removed' | 'renamed'
 
 async function run(): Promise<void> {
   try {
-    const context = github.context
+    const context = github.context;
 
-    // Create GitHub client with the API token.
-    const client = github.getOctokit(core.getInput('token', {required: true}))
-    const format = core.getInput('format', {required: true}) as Format
-
-    // Ensure that the format parameter is set properly.
-    if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
-      core.setFailed(
-        `Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`
-      )
-    }
+    // resolve inputs
+    const inputs = await input.getInputs();
 
     // Debug log the payload.
     core.debug(`Payload keys: ${Object.keys(context.payload)}`)
@@ -106,7 +98,7 @@ async function run(): Promise<void> {
       const filename = file.filename
       // If we're using the 'space-delimited' format and any of the filenames have a space in them,
       // then fail the step.
-      if (format === 'space-delimited' && filename.includes(' ')) {
+      if (inputs.format === 'space-delimited' && filename.includes(' ')) {
         core.setFailed(
           `One of your files includes a space. Consider using a different output format or removing spaces from your filenames. ` +
             "Please submit an issue on this action's GitHub repo."
@@ -142,7 +134,7 @@ async function run(): Promise<void> {
     let removedFormatted: string
     let renamedFormatted: string
     let addedModifiedFormatted: string
-    switch (format) {
+    switch (inputs.format) {
       case 'space-delimited':
         // If any of the filenames have a space in them, then fail the step.
         for (const file of all) {
