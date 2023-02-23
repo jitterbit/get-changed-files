@@ -173,15 +173,20 @@ async function run(): Promise<void> {
     core.info(`Added or modified: ${addedModifiedFormatted}`)
 
     // Set step output context.
-    core.setOutput('all', allFormatted)
-    core.setOutput('added', addedFormatted)
-    core.setOutput('modified', modifiedFormatted)
-    core.setOutput('removed', removedFormatted)
-    core.setOutput('renamed', renamedFormatted)
-    core.setOutput('added_modified', addedModifiedFormatted)
+    Object.entries({
+      all: allFormatted,
+      added: addedFormatted,
+      modified: modifiedFormatted,
+      removed: removedFormatted,
+      renamed: renamedFormatted,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      added_modified: addedModifiedFormatted
+    }).map(([key, value]) => {
+      core.exportVariable('GITHUB_OUTPUT', `${key}=${value}`)
+    })
 
     // For backwards-compatibility
-    core.setOutput('deleted', removedFormatted)
+    core.exportVariable('deleted', removedFormatted)
   } catch (error) {
     core.setFailed(error.message)
   }
