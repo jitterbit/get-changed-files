@@ -1,4 +1,4 @@
-[![CI status](https://github.com/halaslabs/get-changed-files/workflows/CI/badge.svg)](https://github.com/halaslabs/get-changed-files/actions?query=event%3Apush+branch%3Amain)
+[![CI](https://github.com/halaslabs/get-changed-files/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/halaslabs/get-changed-files/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
 
