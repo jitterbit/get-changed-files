@@ -48,7 +48,7 @@
     "@octokit/rest": "^19.0.7",
     "@types/jest": "^26.0.14",
     "@types/node": "^18.14.6",
-    "@typescript-eslint/parser": "^5.53.0",
+    "@typescript-eslint/parser": "^5.54.1",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.35.0",
     "eslint-plugin-github": "^4.3.2",
