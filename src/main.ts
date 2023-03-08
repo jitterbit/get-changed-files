@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
-import {getFileChanges} from './github'
+import {filterFiles} from './filter'
 import {formatFiles} from './format'
+import {getFileChanges} from './github'
 import {getInputs} from './input'
 
 async function run(): Promise<void> {
@@ -19,7 +20,7 @@ async function run(): Promise<void> {
       removedFormatted,
       renamedFormatted,
       addedModifiedFormatted
-    } = formatFiles(files, inputs.format)
+    } = formatFiles(filterFiles(inputs.filters, files), inputs.format)
 
     // Log the output values.
     core.info(`All: ${allFormatted}`)

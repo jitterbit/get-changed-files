@@ -30,7 +30,7 @@
     "node": "^16.0.0"
   },
   "scripts": {
-    "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package && yarn test",
+    "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package",
     "build": "tsc",
     "clean": "rimraf dist/**/* lib/**/*",
     "format": "prettier --write **/*.ts",
@@ -42,10 +42,13 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/github": "^5.1.1"
+    "@actions/github": "^5.1.1",
+    "glob-regex": "^0.3.2",
+    "is-glob": "^4.0.3"
   },
   "devDependencies": {
     "@octokit/rest": "^19.0.7",
+    "@types/is-glob": "^4.0.2",
     "@types/jest": "^26.0.14",
     "@types/node": "^18.14.6",
     "@typescript-eslint/parser": "^5.54.1",

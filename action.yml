@@ -8,6 +8,11 @@ inputs:
       Users shouldn't need to set this themselves.
     required: true
     default: ${{ github.token }}
+  path-filters:
+    description: >
+      Filter files by path.
+      Can be glob patterns or a regular expressions.
+    required: false
   format:
     description: >
       Format of the steps output context.

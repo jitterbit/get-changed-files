@@ -74,6 +74,22 @@ Consider using one of the other formats if that's the case.
     done
 ```
 
+## Get all files changed in specific directories
+```yaml
+- id: files
+  uses: halaslabs/get-changed-files@v2
+  with:
+    format: 'json'
+    path-filters: |
+      /.github/
+      __tests__/**
+- run: |
+    readarray -t files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.all }}')"
+    for file in ${files[@]}; do
+      echo "Do something with this ${file}. from .github or tests/**"
+    done
+```
+
 # Install, Build, Lint, Test, and Package
 
 Make sure to do the following before checking in any code changes.

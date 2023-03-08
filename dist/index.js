@@ -1,6 +1,32 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3707:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.filterFiles = void 0;
+function filterFiles(filters, files) {
+    if (filters.length === 0) {
+        return files;
+    }
+    return files.filter(file => {
+        const filename = file.filename;
+        return filters.some(filter => {
+            if (filter.startsWith('/') && filter.endsWith('/')) {
+                return new RegExp(filter.slice(1, -1)).test(filename);
+            }
+            return new RegExp(filter).test(filename);
+        });
+    });
+}
+exports.filterFiles = filterFiles;
+
+
+/***/ }),
+
 /***/ 6610:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -178,11 +204,6 @@ function getFileChanges(token) {
             throw new Error(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
                 "Please submit an issue on this action's GitHub repo.");
         }
-        // Ensure that the head commit is ahead of the base commit.
-        if (response.data.status !== 'ahead') {
-            throw new Error(`The head commit for this ${github_1.context.eventName} event is not ahead of the base commit. ` +
-                "Please submit an issue on this action's GitHub repo.");
-        }
         if (response.data.files === undefined) {
             throw new Error('Unexpected response from GitHub API, files property is undefined.');
         }
@@ -223,9 +244,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const is_glob_1 = __importDefault(__nccwpck_require__(4466));
+const glob_regex_1 = __importDefault(__nccwpck_require__(2952));
 function getInputs() {
     //github token
     const token = core.getInput('token', { required: true });
@@ -235,7 +261,21 @@ function getInputs() {
     if (format !== 'space-delimited' && format !== 'csv' && format !== 'json') {
         throw new Error(`Format must be one of 'string-delimited', 'csv', or 'json', got '${format}'.`);
     }
-    return { token, format };
+    //path filters
+    const filters = core
+        .getMultilineInput('path-filters', { required: false })
+        .map((filter) => {
+        // If filter is a regexp return it
+        if (filter.startsWith('/') && filter.endsWith('/')) {
+            return filter;
+        }
+        // if filter is a glob convert to regexp
+        if ((0, is_glob_1.default)(filter)) {
+            return glob_regex_1.default.replace(filter);
+        }
+        throw new Error(`Path filter must be a glob or a regexp, got '${filter}'.`);
+    });
+    return { token, format, filters };
 }
 exports.getInputs = getInputs;
 
@@ -281,8 +321,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github_1 = __nccwpck_require__(5928);
+const filter_1 = __nccwpck_require__(3707);
 const format_1 = __nccwpck_require__(6610);
+const github_1 = __nccwpck_require__(5928);
 const input_1 = __nccwpck_require__(8657);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -292,7 +333,7 @@ function run() {
             // compare commits
             const files = yield (0, github_1.getFileChanges)(inputs.token);
             // Format the changed files.
-            const { allFormatted, addedFormatted, modifiedFormatted, removedFormatted, renamedFormatted, addedModifiedFormatted } = (0, format_1.formatFiles)(files, inputs.format);
+            const { allFormatted, addedFormatted, modifiedFormatted, removedFormatted, renamedFormatted, addedModifiedFormatted } = (0, format_1.formatFiles)((0, filter_1.filterFiles)(inputs.filters, files), inputs.format);
             // Log the output values.
             core.info(`All: ${allFormatted}`);
             core.info(`Added: ${addedFormatted}`);
@@ -4867,6 +4908,233 @@ class Deprecation extends Error {
 }
 
 exports.Deprecation = Deprecation;
+
+
+/***/ }),
+
+/***/ 2952:
+/***/ ((module) => {
+
+
+var dotRE = /\./g
+var dotPattern = '\\.'
+
+var restRE = /\*\*$/g
+var restPattern = '(.+)'
+
+var globRE = /(?:\*\*\/|\*\*|\*)/g
+var globPatterns = {
+  '*': '([^/]+)',        // no backslashes
+  '**': '(.+/)?([^/]+)', // short for "**/*"
+  '**/': '(.+/)?',       // one or more directories
+}
+
+function mapToPattern(str) {
+  return globPatterns[str]
+}
+
+function replace(glob) {
+  return glob
+    .replace(dotRE, dotPattern)
+    .replace(restRE, restPattern)
+    .replace(globRE, mapToPattern)
+}
+
+function join(globs) {
+  return '((' + globs.map(replace).join(')|(') + '))'
+}
+
+function globRegex(glob) {
+  return new RegExp('^' + (Array.isArray(glob) ? join : replace)(glob) + '$')
+}
+
+globRegex.replace = replace
+Object.defineProperty(globRegex, 'default', { value: globRegex })
+module.exports = globRegex
+
+
+/***/ }),
+
+/***/ 6435:
+/***/ ((module) => {
+
+/*!
+ * is-extglob <https://github.com/jonschlinkert/is-extglob>
+ *
+ * Copyright (c) 2014-2016, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+module.exports = function isExtglob(str) {
+  if (typeof str !== 'string' || str === '') {
+    return false;
+  }
+
+  var match;
+  while ((match = /(\\).|([@?!+*]\(.*\))/g.exec(str))) {
+    if (match[2]) return true;
+    str = str.slice(match.index + match[0].length);
+  }
+
+  return false;
+};
+
+
+/***/ }),
+
+/***/ 4466:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/*!
+ * is-glob <https://github.com/jonschlinkert/is-glob>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+var isExtglob = __nccwpck_require__(6435);
+var chars = { '{': '}', '(': ')', '[': ']'};
+var strictCheck = function(str) {
+  if (str[0] === '!') {
+    return true;
+  }
+  var index = 0;
+  var pipeIndex = -2;
+  var closeSquareIndex = -2;
+  var closeCurlyIndex = -2;
+  var closeParenIndex = -2;
+  var backSlashIndex = -2;
+  while (index < str.length) {
+    if (str[index] === '*') {
+      return true;
+    }
+
+    if (str[index + 1] === '?' && /[\].+)]/.test(str[index])) {
+      return true;
+    }
+
+    if (closeSquareIndex !== -1 && str[index] === '[' && str[index + 1] !== ']') {
+      if (closeSquareIndex < index) {
+        closeSquareIndex = str.indexOf(']', index);
+      }
+      if (closeSquareIndex > index) {
+        if (backSlashIndex === -1 || backSlashIndex > closeSquareIndex) {
+          return true;
+        }
+        backSlashIndex = str.indexOf('\\', index);
+        if (backSlashIndex === -1 || backSlashIndex > closeSquareIndex) {
+          return true;
+        }
+      }
+    }
+
+    if (closeCurlyIndex !== -1 && str[index] === '{' && str[index + 1] !== '}') {
+      closeCurlyIndex = str.indexOf('}', index);
+      if (closeCurlyIndex > index) {
+        backSlashIndex = str.indexOf('\\', index);
+        if (backSlashIndex === -1 || backSlashIndex > closeCurlyIndex) {
+          return true;
+        }
+      }
+    }
+
+    if (closeParenIndex !== -1 && str[index] === '(' && str[index + 1] === '?' && /[:!=]/.test(str[index + 2]) && str[index + 3] !== ')') {
+      closeParenIndex = str.indexOf(')', index);
+      if (closeParenIndex > index) {
+        backSlashIndex = str.indexOf('\\', index);
+        if (backSlashIndex === -1 || backSlashIndex > closeParenIndex) {
+          return true;
+        }
+      }
+    }
+
+    if (pipeIndex !== -1 && str[index] === '(' && str[index + 1] !== '|') {
+      if (pipeIndex < index) {
+        pipeIndex = str.indexOf('|', index);
+      }
+      if (pipeIndex !== -1 && str[pipeIndex + 1] !== ')') {
+        closeParenIndex = str.indexOf(')', pipeIndex);
+        if (closeParenIndex > pipeIndex) {
+          backSlashIndex = str.indexOf('\\', pipeIndex);
+          if (backSlashIndex === -1 || backSlashIndex > closeParenIndex) {
+            return true;
+          }
+        }
+      }
+    }
+
+    if (str[index] === '\\') {
+      var open = str[index + 1];
+      index += 2;
+      var close = chars[open];
+
+      if (close) {
+        var n = str.indexOf(close, index);
+        if (n !== -1) {
+          index = n + 1;
+        }
+      }
+
+      if (str[index] === '!') {
+        return true;
+      }
+    } else {
+      index++;
+    }
+  }
+  return false;
+};
+
+var relaxedCheck = function(str) {
+  if (str[0] === '!') {
+    return true;
+  }
+  var index = 0;
+  while (index < str.length) {
+    if (/[*?{}()[\]]/.test(str[index])) {
+      return true;
+    }
+
+    if (str[index] === '\\') {
+      var open = str[index + 1];
+      index += 2;
+      var close = chars[open];
+
+      if (close) {
+        var n = str.indexOf(close, index);
+        if (n !== -1) {
+          index = n + 1;
+        }
+      }
+
+      if (str[index] === '!') {
+        return true;
+      }
+    } else {
+      index++;
+    }
+  }
+  return false;
+};
+
+module.exports = function isGlob(str, options) {
+  if (typeof str !== 'string' || str === '') {
+    return false;
+  }
+
+  if (isExtglob(str)) {
+    return true;
+  }
+
+  var check = strictCheck;
+
+  // optionally relax check
+  if (options && options.strict === false) {
+    check = relaxedCheck;
+  }
+
+  return check(str);
+};
 
 
 /***/ }),

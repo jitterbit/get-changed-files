@@ -61,14 +61,6 @@ export async function getFileChanges(token: string): Promise<DiffEntry[]> {
     )
   }
 
-  // Ensure that the head commit is ahead of the base commit.
-  if (response.data.status !== 'ahead') {
-    throw new Error(
-      `The head commit for this ${context.eventName} event is not ahead of the base commit. ` +
-        "Please submit an issue on this action's GitHub repo."
-    )
-  }
-
   if (response.data.files === undefined) {
     throw new Error(
       'Unexpected response from GitHub API, files property is undefined.'

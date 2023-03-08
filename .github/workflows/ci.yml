@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build
+  validate:
+    name: Test and Validate Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,12 +19,13 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: |
-          yarn
+        run: yarn
 
-      - name: Clean, build, format, lint, package, and test
-        run: |
-          yarn all
+      - name: Run tests
+        run: yarn test
+
+      - name: Clean, build, format, lint, and package
+        run: yarn all
 
       - name: Check if packaged properly
         run: |
@@ -38,22 +39,54 @@ jobs:
             exit 1
           fi
 
-  test:
-    name: Test
+  integration-test:
+    name: Run Action
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: files
-        name: Run the action
+      - id: defaults
+        name: Run with defaults
         uses: ./
 
-      - name: Print steps context output
+      - name: Output default
         run: |
-          echo 'steps.files.outputs.all=${{ steps.files.outputs.all }}'
-          echo 'steps.files.outputs.added=${{ steps.files.outputs.added }}'
-          echo 'steps.files.outputs.modified=${{ steps.files.outputs.modified }}'
-          echo 'steps.files.outputs.removed=${{ steps.files.outputs.removed }}'
-          echo 'steps.files.outputs.renamed=${{ steps.files.outputs.renamed }}'
-          echo 'steps.files.outputs.added_modified=${{ steps.files.outputs.added_modified }}'
+          echo 'steps.defaults.outputs.all=${{ steps.defaults.outputs.all }}'
+          echo 'steps.defaults.outputs.added=${{ steps.defaults.outputs.added }}'
+          echo 'steps.defaults.outputs.modified=${{ steps.defaults.outputs.modified }}'
+          echo 'steps.defaults.outputs.removed=${{ steps.defaults.outputs.removed }}'
+          echo 'steps.defaults.outputs.renamed=${{ steps.defaults.outputs.renamed }}'
+          echo 'steps.defaults.outputs.added_modified=${{ steps.defaults.outputs.added_modified }}'
+
+      - id: csv
+        name: Run with csv format
+        uses: ./
+        with:
+          format: csv
+
+      - name: Output csv
+        run: |
+          echo 'steps.csv.outputs.all=${{ steps.csv.outputs.all }}'
+          echo 'steps.csv.outputs.added=${{ steps.csv.outputs.added }}'
+          echo 'steps.csv.outputs.modified=${{ steps.csv.outputs.modified }}'
+          echo 'steps.csv.outputs.removed=${{ steps.csv.outputs.removed }}'
+          echo 'steps.csv.outputs.renamed=${{ steps.csv.outputs.renamed }}'
+          echo 'steps.csv.outputs.added_modified=${{ steps.csv.outputs.added_modified }}'
+
+      - id: filter
+        name: Run with filter
+        uses: ./
+        with:
+          path-filters: |
+            /.github/
+            __tests__/**
+
+      - name: Output filter
+        run: |
+          echo 'steps.filter.outputs.all=${{ steps.filter.outputs.all }}'
+          echo 'steps.filter.outputs.added=${{ steps.filter.outputs.added }}'
+          echo 'steps.filter.outputs.modified=${{ steps.filter.outputs.modified }}'
+          echo 'steps.filter.outputs.removed=${{ steps.filter.outputs.removed }}'
+          echo 'steps.filter.outputs.renamed=${{ steps.filter.outputs.renamed }}'
+          echo 'steps.filter.outputs.added_modified=${{ steps.filter.outputs.added_modified }}'

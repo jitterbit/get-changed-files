@@ -1,6 +1,6 @@
 import fs from 'fs'
 import {formatFiles} from '../src/format'
-import { Format } from '../src/types'
+import {Format} from '../src/types'
 
 const getFiles = () => {
   return JSON.parse(
@@ -8,41 +8,37 @@ const getFiles = () => {
   ).files
 }
 
-//test formatting and categorizing
-test('format files', () => {
-  const changedFiles = formatFiles(getFiles(), 'csv')
-  expect(changedFiles.allFormatted).toBe(
-    'added.txt,modified.txt,removed.txt,renamed.txt'
-  )
-  expect(changedFiles.addedFormatted).toBe('added.txt')
-  expect(changedFiles.modifiedFormatted).toBe('modified.txt')
-  expect(changedFiles.removedFormatted).toBe('removed.txt')
-  expect(changedFiles.addedModifiedFormatted).toBe('added.txt,modified.txt')
-})
-
 //test csv format
 test('csv format', () => {
   const changedFiles = formatFiles(getFiles(), 'csv')
   expect(changedFiles.allFormatted).toBe(
-    'added.txt,modified.txt,removed.txt,renamed.txt'
+    'added.txt,modified.txt,removed.txt,renamed.txt,path1/added.txt,path2/removed.txt,path2/added.txt,path3/path4/added.txt'
   )
-  expect(changedFiles.addedFormatted).toBe('added.txt')
+  expect(changedFiles.addedFormatted).toBe(
+    'added.txt,path1/added.txt,path2/added.txt,path3/path4/added.txt'
+  )
   expect(changedFiles.modifiedFormatted).toBe('modified.txt')
-  expect(changedFiles.removedFormatted).toBe('removed.txt')
-  expect(changedFiles.addedModifiedFormatted).toBe('added.txt,modified.txt')
+  expect(changedFiles.removedFormatted).toBe('removed.txt,path2/removed.txt')
+  expect(changedFiles.addedModifiedFormatted).toBe(
+    'added.txt,modified.txt,path1/added.txt,path2/added.txt,path3/path4/added.txt'
+  )
 })
 
 //test json format
 test('json format', () => {
   const changedFiles = formatFiles(getFiles(), 'json')
   expect(changedFiles.allFormatted).toBe(
-    '["added.txt","modified.txt","removed.txt","renamed.txt"]'
+    '["added.txt","modified.txt","removed.txt","renamed.txt","path1/added.txt","path2/removed.txt","path2/added.txt","path3/path4/added.txt"]'
   )
-  expect(changedFiles.addedFormatted).toBe('["added.txt"]')
+  expect(changedFiles.addedFormatted).toBe(
+    '["added.txt","path1/added.txt","path2/added.txt","path3/path4/added.txt"]'
+  )
   expect(changedFiles.modifiedFormatted).toBe('["modified.txt"]')
-  expect(changedFiles.removedFormatted).toBe('["removed.txt"]')
+  expect(changedFiles.removedFormatted).toBe(
+    '["removed.txt","path2/removed.txt"]'
+  )
   expect(changedFiles.addedModifiedFormatted).toBe(
-    '["added.txt","modified.txt"]'
+    '["added.txt","modified.txt","path1/added.txt","path2/added.txt","path3/path4/added.txt"]'
   )
 })
 
@@ -50,12 +46,16 @@ test('json format', () => {
 test('space-delimited format', () => {
   const changedFiles = formatFiles(getFiles(), 'space-delimited')
   expect(changedFiles.allFormatted).toBe(
-    'added.txt modified.txt removed.txt renamed.txt'
+    'added.txt modified.txt removed.txt renamed.txt path1/added.txt path2/removed.txt path2/added.txt path3/path4/added.txt'
   )
-  expect(changedFiles.addedFormatted).toBe('added.txt')
+  expect(changedFiles.addedFormatted).toBe(
+    'added.txt path1/added.txt path2/added.txt path3/path4/added.txt'
+  )
   expect(changedFiles.modifiedFormatted).toBe('modified.txt')
-  expect(changedFiles.removedFormatted).toBe('removed.txt')
-  expect(changedFiles.addedModifiedFormatted).toBe('added.txt modified.txt')
+  expect(changedFiles.removedFormatted).toBe('removed.txt path2/removed.txt')
+  expect(changedFiles.addedModifiedFormatted).toBe(
+    'added.txt modified.txt path1/added.txt path2/added.txt path3/path4/added.txt'
+  )
 })
 
 //test error thrown when file name includes a space
@@ -74,5 +74,5 @@ test('error thrown when file status is not supported', () => {
 
 //test when format is invalid
 test('error thrown format is invalid', () => {
-    expect(() => formatFiles(getFiles(), 'foo' as Format)).toThrowError()
-  })
+  expect(() => formatFiles(getFiles(), 'foo' as Format)).toThrowError()
+})
