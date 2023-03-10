@@ -165,12 +165,10 @@ function getFileChanges(token) {
     return __awaiter(this, void 0, void 0, function* () {
         // Debug log the payload.
         core.debug(`Payload keys: ${Object.keys(github_1.context.payload)}`);
-        // Get event name.
-        const eventName = github_1.context.eventName;
         // Define the base and head commits to be extracted from the payload.
         let base;
         let head;
-        switch (eventName) {
+        switch (github_1.context.eventName) {
             case 'pull_request':
                 base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
                 head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
@@ -180,8 +178,8 @@ function getFileChanges(token) {
                 head = github_1.context.payload.after;
                 break;
             default:
-                throw new Error(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
-                    "Please submit an issue on this action's GitHub repo if you believe this in correct.");
+                core.debug(`There is no explicit base in ${github_1.context.eventName} events, skipping compare API request.`);
+                return [];
         }
         // Log the base and head commits
         core.info(`Base commit: ${base}`);

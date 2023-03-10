@@ -6,14 +6,11 @@ export async function getFileChanges(token: string): Promise<DiffEntry[]> {
   // Debug log the payload.
   core.debug(`Payload keys: ${Object.keys(context.payload)}`)
 
-  // Get event name.
-  const eventName = context.eventName
-
   // Define the base and head commits to be extracted from the payload.
   let base: string | undefined
   let head: string | undefined
 
-  switch (eventName) {
+  switch (context.eventName) {
     case 'pull_request':
       base = context.payload.pull_request?.base?.sha
       head = context.payload.pull_request?.head?.sha
@@ -23,10 +20,10 @@ export async function getFileChanges(token: string): Promise<DiffEntry[]> {
       head = context.payload.after
       break
     default:
-      throw new Error(
-        `This action only supports pull requests and pushes, ${context.eventName} events are not supported. ` +
-          "Please submit an issue on this action's GitHub repo if you believe this in correct."
+      core.debug(
+        `There is no explicit base in ${context.eventName} events, skipping compare API request.`
       )
+      return []
   }
 
   // Log the base and head commits
