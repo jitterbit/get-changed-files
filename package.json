@@ -26,7 +26,7 @@
   ],
   "main": "lib/main.js",
   "engines": {
-    "node": "^12.0.0"
+    "node": "^16.0.0"
   },
   "scripts": {
     "build": "tsc",
@@ -39,7 +39,7 @@
     "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package && yarn test"
   },
   "dependencies": {
-    "@actions/core": "^1.2.2",
+    "@actions/core": "^1.10.0",
     "@actions/github": "^2.1.0"
   },
   "devDependencies": {
