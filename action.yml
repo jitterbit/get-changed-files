@@ -5,7 +5,7 @@ branding:
   icon: file
   color: purple
 runs:
-  using: node12
+  using: node16
   main: dist/index.js
 inputs:
   token:
