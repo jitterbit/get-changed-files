@@ -47,7 +47,7 @@
     "is-glob": "^4.0.3"
   },
   "devDependencies": {
-    "@octokit/rest": "^19.0.7",
+    "@octokit/rest": "^19.0.13",
     "@types/is-glob": "^4.0.2",
     "@types/jest": "^26.0.14",
     "@types/node": "^18.15.11",
