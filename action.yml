@@ -39,5 +39,5 @@ outputs:
     description: >
       Array of all added and modified files.
 runs:
-  using: node16
+  using: node20
   main: dist/index.js

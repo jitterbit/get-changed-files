@@ -27,7 +27,7 @@
   ],
   "main": "lib/main.js",
   "engines": {
-    "node": "^16.0.0"
+    "node": "^20.0.0"
   },
   "scripts": {
     "all": "yarn clean && yarn build && yarn format && yarn lint && yarn package",
